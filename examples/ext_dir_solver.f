@@ -84,6 +84,7 @@ c
         srcinfo(4,i) = a*sin(thet)/srcinfo(5,i)
       enddo
 
+      call prinf("Entering slp*",i,0)
       call slp(src,targ,dpars,zpars,ipars,uex)
 
       allocate(amat(n,n),rhs(n),soln(n))
@@ -95,13 +96,8 @@ c
       zpars(2) = 1
       zpars(3) = 1
       zpars(3) = 0
-      call prinf('n=*',n,1)
-      call prin2('h=*',h,1)
-      call prin2('zpars=*',zpars,6)
-      call prinf('norder=*',norder,1)
       call formmatbac(amat,norder,n,srcinfo,h,slp,dpars,zpars,ipars)
   
-      print *, zpars(3)
       do i=1,n
         amat(i,i) = amat(i,i) + 0.5d0*zpars(3)
       enddo

@@ -171,6 +171,8 @@ c
 c        . . . if z in the upper half-plane - act accordingly
 c
         if(imag(z) .lt. 0) goto 1400
+
+        ier = 0
         call hank103u(z,ier,h0,h1,ifexpon)
         return
  1400 continue
@@ -188,6 +190,7 @@ c       in the x and y axis, respectively
 c
         zu=dconjg(z)
         zr=-zu
+
 c
         call hank103u(zu,ier,h0u,h1u,ifexpon)
         call hank103r(zr,ier,h0r,h1r,ifexpon)
@@ -491,6 +494,8 @@ c        z is either in the local regime or the asymptotic one.
 c        if it is in the local regime - act accordingly.
 c
         if(d .gt. 50.d0) goto 4000
+
+
         call hank103l(z,h0,h1,ifexpon)
         return
 c
@@ -591,6 +596,7 @@ c
 c
         qq=q(m)
         qq1=q1(m)
+
 c
         do 1600 i=m-1,1,-1
 
@@ -628,8 +634,9 @@ c
         complex *16 z,fj0,fj1,y0,y1,h0,h1,z2,cd,ima,cdddlog
 c
         data gamma/0.5772156649015328606d+00/
-        data ima/(0.0d0,1.0d0)/,pi/0.31415926535897932D+01/,
-     1      two/2.0d0/
+        data ima/(0.0d0,1.0d0)/
+        data pi/0.31415926535897932D+01/
+        data two/2.0d0/
 c
 c        this subroutine evaluates the hankel functions H_0^1, H_1^1
 c        for a user-specified complex number z in the local regime,
@@ -683,6 +690,7 @@ c
      6     0.9941241959127275D-20,  -.1934767032549593D-22,
      7     0.3177446263369152D-25,  -.4462657240925946D-28,
      8     0.5421613028002404D-31,  -.5753886457968550D-34/
+
 c
 c        evaluate j0, j1
 c
@@ -693,15 +701,16 @@ c
         y1=0
         z2=z**2
         cd=1
-c        
+c       
         do 1800 i=1,m
-        fj0=fj0+cj0(i)*cd
-        fj1=fj1+cj1(i)*cd
-        y1=y1+ser2der(i)*cd
-        cd=cd*z2
-        y0=y0+ser2(i)*cd
+          fj0=fj0+cj0(i)*cd
+          fj1=fj1+cj1(i)*cd
+          y1=y1+ser2der(i)*cd
+          cd=cd*z2
+          y0=y0+ser2(i)*cd
  1800 continue
         fj1=-fj1*z
+
 c
         cdddlog=cdlog(z/two)+gamma
         y0=cdddlog*fj0+y0
@@ -711,6 +720,7 @@ c
 c
         y1=-cdddlog*fj1+fj0/z+y1
         y1=-y1*two/pi
+
 c
         h0=fj0+ima*y0
         h1=fj1+ima*y1

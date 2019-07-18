@@ -12,7 +12,7 @@
 CC=gcc
 FC=gfortran
 
-FFLAGS= -fPIC -O3 -march=native -funroll-loops  
+FFLAGS= -fPIC -O3 -march=native   
 CFLAGS= -std=c99 
 CFLAGS+= $(FFLAGS) 
 
@@ -43,7 +43,7 @@ MWRAP=../../mwrap-0.33/mwrap
 OBJS = src/hank103.o src/prini.o src/helm_kernels.o  \
 	src/formsysmatbac.o 
 
-.PHONY: usage examples matlab
+.PHONY: usage examples matlab debug
 
 default: usage 
 
@@ -94,6 +94,13 @@ examples: $(OBJS) examples/ext_dir
 
 examples/ext_dir:
 	$(FC) $(FFLAGS) examples/ext_dir_solver.f $(OBJS) -o examples/ext_dir_solver -llapack -lblas
+
+debug: $(OBJS) examples/hh 
+	time -p ./examples/hank
+
+examples/hh:
+	$(FC) $(FFLAGS) examples/test_hank103.f $(OBJS) -o examples/hank 
+
 
 
 clean: objclean

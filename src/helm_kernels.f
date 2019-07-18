@@ -2,7 +2,7 @@
       implicit real *8 (a-h,o-z)
       integer ipars(*)
       real *8 dpars(*),srcinfo(*),targinfo(*)
-      complex *16 zpars(*),u,h0,ima,zs,z,zk
+      complex *16 zpars(*),u,h0,ima,zs,z,zk,h1
 
       zk = zpars(1)
       ima = dcmplx(0.0d0,1.0d0)
@@ -11,6 +11,7 @@
       rr = dsqrt(rr2)
       z = zk*rr
       ifexpon = 1
+
       call hank103(z,h0,h1,ifexpon)
       u = zs*h0
       
