@@ -12,7 +12,7 @@
 CC=gcc
 FC=gfortran
 
-FFLAGS= -fPIC -O3 -march=native   
+FFLAGS= -fPIC -O3 -march=native -funroll-loops  
 CFLAGS= -std=c99 
 CFLAGS+= $(FFLAGS) 
 

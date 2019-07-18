@@ -40,10 +40,9 @@ c       geometry params for larry cup
 c
 
       zk = 1.0d1
-      zk = 0.1d0
       zpars(1) = zk
       norder = 16
-      ppw = 60
+      ppw = 20
 
 c
 c       geometry is an ellipse, major axis=a, minor axis=b
@@ -60,7 +59,6 @@ c
       rl_approx = 0
 
       h = 2*pi/ninit
-      call prin2('h=*',h,1)
       do i=1,ninit
         thet = (i-1)*h
         rl_approx = rl_approx+sqrt((a*sin(thet))**2+(b*cos(thet))**2)*h
@@ -68,10 +66,8 @@ c
 
       n = max(ceiling(rl_approx*abs(zk)/(2*pi)*ppw),100)
 
-      n = 200
       h = 2*pi/n
 
-      call prinf('npts=*',n,1)
 c
 c       initialize the geometry
 c
@@ -84,7 +80,6 @@ c
         srcinfo(4,i) = a*sin(thet)/srcinfo(5,i)
       enddo
 
-      call prinf("Entering slp*",i,0)
       call slp(src,targ,dpars,zpars,ipars,uex)
 
       allocate(amat(n,n),rhs(n),soln(n))
@@ -93,24 +88,17 @@ c     form system matrix
 c
 c
       zpars(2) = -ima*zk
-      zpars(2) = 1
       zpars(3) = 1
-      zpars(3) = 0
-      call formmatbac(amat,norder,n,srcinfo,h,slp,dpars,zpars,ipars)
+      call formmatbac(amat,norder,n,srcinfo,h,comb,dpars,zpars,ipars)
   
       do i=1,n
         amat(i,i) = amat(i,i) + 0.5d0*zpars(3)
       enddo
 
       do i=1,n
-        write(32,*) srcinfo(1,i),srcinfo(2,i)
-      enddo
-
-      do i=1,n
         call slp(src,srcinfo(1,i),dpars,zpars,ipars,rhs(i))
         soln(i) = rhs(i)
       enddo
-      call prin2('rhs=*',rhs,24)
 
       allocate(ipvt(n))
       info = 0
@@ -118,25 +106,18 @@ c
       
       transa = 'n'
       info = 0
-cc      call prin2('soln=*',soln,2*n)
-cc      call prin2('amat=*',amat,2*n*n)
 
       nn = 1
       call zgetrs(transa,n,nn,amat,n,ipvt,soln,n,info)
-      call prin2('soln=*',soln,12)
-      call prinf('info=*',info,1)
 
 c
 c     evaluate solution at target point     
 c
    
       ssum = 0.0d0
-      call prin2('targ=*',targ,2)
-      call prin2('zpars=*',zpars,6)
-      call prin2('h=*',h,1)
       do i = 1,n
         w = srcinfo(5,i)*h
-        call slp(srcinfo(1,i),targ,dpars,zpars,ipars,u)
+        call comb(srcinfo(1,i),targ,dpars,zpars,ipars,u)
         ssum = ssum + soln(i)*u*w
       enddo
 
