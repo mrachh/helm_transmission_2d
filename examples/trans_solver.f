@@ -185,10 +185,12 @@ c      exterior
 c
       zpars(1) = zk(1)
       zpars(2) = zk(2)
-      zpars(3) = 1
-      zpars(4) = -1
+      zpars(3) = 1.0d0
+      zpars(4) = 0.0d0
       zpars(5) = 0
       zpars(6) = 0
+
+      call prin2('zpars=*',zpars,12)
       call formmatbac(amattmp,norder,n,srcinfo,h,transmission_neu,
      1    dpars,zpars,ipars)
   

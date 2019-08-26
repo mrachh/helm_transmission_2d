@@ -202,9 +202,9 @@ c
      1    d2gdxdy*(srcinfo(3)*targinfo(3) + srcinfo(4)*targinfo(4)) + 
      2    d2gdy2*srcinfo(4)*targinfo(4))
 
-      gx = zs*zk*h1*(srcinfo(1)-targinfo(1))/rr
-      gy = zs*zk*h1*(srcinfo(2)-targinfo(2))/rr
-      
+      gx = zs*zk*h1*(targinfo(1)-srcinfo(1))/rr
+      gy = zs*zk*h1*(targinfo(2)-srcinfo(2))/rr
+
       gs0 = gx*targinfo(3) + gy*targinfo(4)
 
 
