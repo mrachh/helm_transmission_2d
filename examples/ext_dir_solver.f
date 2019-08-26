@@ -35,9 +35,6 @@ c
 
       nmax = 8000
       allocate(srcinfo(5,nmax))
-c
-c       geometry params for larry cup
-c
 
       zk = 1.0d1
       zpars(1) = zk
@@ -83,24 +80,111 @@ c
       call slp(src,targ,dpars,zpars,ipars,uex)
 
       allocate(amat(n,n),rhs(n),soln(n))
+      allocate(ipvt(n))
 c
 c     form system matrix 
 c
 c
-      zpars(2) = -ima*zk
-      zpars(3) = 1
-      call formmatbac(amat,norder,n,srcinfo,h,comb,dpars,zpars,ipars)
-  
-      do i=1,n
-        amat(i,i) = amat(i,i) + 0.5d0*zpars(3)
-      enddo
+
+c
+c       test slp mat
+c
+      call slp_mat(n,norder,h,srcinfo,zk,amat)
+      
+
 
       do i=1,n
         call slp(src,srcinfo(1,i),dpars,zpars,ipars,rhs(i))
         soln(i) = rhs(i)
       enddo
 
-      allocate(ipvt(n))
+      info = 0
+      call zgetrf(n,n,amat,n,ipvt,info)
+      
+      transa = 'n'
+      info = 0
+
+      nn = 1
+      call zgetrs(transa,n,nn,amat,n,ipvt,soln,n,info)
+
+c
+c     evaluate solution at target point     
+c
+   
+      ssum = 0.0d0
+      do i = 1,n
+        w = srcinfo(5,i)*h
+        call slp(srcinfo(1,i),targ,dpars,zpars,ipars,u)
+        ssum = ssum + soln(i)*u*w
+      enddo
+
+      write(6,*) ' slp test'
+      write(6,*) ' ssum is ',ssum
+      write(13,*) ' ssum is ',ssum
+      write(6,*) ' uex is ',uex
+      write(6,*) ' ssum/uex is ',(ssum/uex)
+      write(13,*) ' ssum/uex is ',(ssum/uex)
+      write(6,*) ' '
+      write(6,*) ' '
+      write(6,*) '------------------------'
+c
+c
+c       test dlp_mat
+c
+      call dlp_ext_mat(n,norder,h,srcinfo,zk,amat)
+      
+
+
+      do i=1,n
+        call slp(src,srcinfo(1,i),dpars,zpars,ipars,rhs(i))
+        soln(i) = rhs(i)
+      enddo
+
+      info = 0
+      call zgetrf(n,n,amat,n,ipvt,info)
+      
+      transa = 'n'
+      info = 0
+
+      nn = 1
+      call zgetrs(transa,n,nn,amat,n,ipvt,soln,n,info)
+
+c
+c     evaluate solution at target point     
+c
+   
+      ssum = 0.0d0
+      do i = 1,n
+        w = srcinfo(5,i)*h
+        call dlp(srcinfo(1,i),targ,dpars,zpars,ipars,u)
+        ssum = ssum + soln(i)*u*w
+      enddo
+
+      write(6,*) 'dlp test'
+      write(6,*) ' ssum is ',ssum
+      write(13,*) ' ssum is ',ssum
+      write(6,*) ' uex is ',uex
+      write(6,*) ' ssum/uex is ',(ssum/uex)
+      write(13,*) ' ssum/uex is ',(ssum/uex)
+      write(6,*) ' '
+      write(6,*) ' '
+      write(6,*) '------------------------'
+c
+c
+c      test comb_mat
+c
+
+
+      zpars(2) = -ima*zk
+      zpars(3) = 1
+      call comb_ext_mat(n,norder,h,srcinfo,zpars,amat)
+  
+
+      do i=1,n
+        call slp(src,srcinfo(1,i),dpars,zpars,ipars,rhs(i))
+        soln(i) = rhs(i)
+      enddo
+
       info = 0
       call zgetrf(n,n,amat,n,ipvt,info)
       
@@ -121,6 +205,7 @@ c
         ssum = ssum + soln(i)*u*w
       enddo
 
+      write(6,*) 'comb test'
       write(6,*) ' ssum is ',ssum
       write(13,*) ' ssum is ',ssum
       write(6,*) ' uex is ',uex

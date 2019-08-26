@@ -41,13 +41,13 @@ MWRAP=../../mwrap-0.33/mwrap
  
 # Helmholtz objects
 OBJS = src/hank103.o src/prini.o src/helm_kernels.o  \
-	src/formsysmatbac.o 
+	src/formsysmatbac.o src/kern_mats.o 
 
 .PHONY: usage examples matlab debug
 
 default: usage 
 
-all: examples matlab
+all: examples matlab 
 
 usage:
 	@echo "Makefile for FMM3D. Specify what to make:"
@@ -65,16 +65,21 @@ usage:
 %.o: %.f %.h
 	$(FC) -c $(FFLAGS) $< -o $@
 
+LIBNAME = libhelmtrans
+STATICLIB = lib-static/$(LIBNAME).a
+
+$(STATICLIB): $(OBJS) 
+	ar rcs $(STATICLIB) $(OBJS)
 
 # matlab..
-MWRAPFILE = fmm3d
-MWRAPFILE2 = fmm3d_legacy
+MWRAPFILE = kern_mats
+MWRAPFILE2 = helm_kernels
 GATEWAY = $(MWRAPFILE)
 GATEWAY2 = $(MWRAPFILE2)
 
 matlab:	$(STATICLIB) matlab/$(GATEWAY).c matlab/$(GATEWAY2).c
-	$(MEX) matlab/$(GATEWAY).c $(STATICLIB) $(MFLAGS) -output matlab/fmm3d $(MEX_LIBS);
-	$(MEX) matlab/$(GATEWAY2).c $(STATICLIB) $(MFLAGS) -output matlab/fmm3d_legacy $(MEXLIBS);
+	$(MEX) matlab/$(GATEWAY).c $(STATICLIB) $(MFLAGS) -output matlab/kern_mats $(MEX_LIBS);
+	$(MEX) matlab/$(GATEWAY2).c $(STATICLIB) $(MFLAGS) -output matlab/helm_kernels $(MEXLIBS);
 
 
 mex:  $(STATICLIB)
@@ -89,22 +94,19 @@ mex:  $(STATICLIB)
 ##  examples
 #
 
-examples: $(OBJS) examples/ext_dir 
+examples: $(OBJS) examples/ext_dir examples/trans 
 	time -p ./examples/ext_dir_solver
+	time -p ./examples/trans_solver
 
 examples/ext_dir:
 	$(FC) $(FFLAGS) examples/ext_dir_solver.f $(OBJS) -o examples/ext_dir_solver -llapack -lblas
 
-debug: $(OBJS) examples/hh 
-	time -p ./examples/hank
-
-examples/hh:
-	$(FC) $(FFLAGS) examples/test_hank103.f $(OBJS) -o examples/hank 
-
+examples/trans:
+	$(FC) $(FFLAGS) examples/trans_solver.f $(OBJS) -o examples/trans_solver -llapack -lblas
 
 
 clean: objclean
-	rm -f examples/ext_dir
+	rm -f examples/ext_dir_solver examples/trans_solvr
 
 objclean: 
 	rm -f $(OBJS) 
