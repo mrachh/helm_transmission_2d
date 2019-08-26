@@ -76,6 +76,7 @@ c
  
       nmax = 8000
       allocate(srcinfo(5,nmax))
+
 c
 c       geometry params for larry cup
 c
@@ -122,6 +123,7 @@ c
       nsys = 2*n
 
 
+
       allocate(amat(nsys,nsys),rhs(nsys),soln(nsys))
       allocate(amattmp(n,n))
 c
@@ -141,6 +143,7 @@ c
       zpars(5) = 0
       zpars(6) = 0
       q = 0.5d0*(a(1)/b(1) + a(2)/b(2))
+
       call prin2('q=*',q,2)
       call prin2('zpars=*',zpars,12)
       call prinf('norder=*',norder,1)
@@ -189,6 +192,15 @@ c
       zpars(4) = -1
       zpars(5) = 0
       zpars(6) = 0
+
+      do i=1,n 
+        do j=1,n
+          amattmp(i,j) = 0
+        enddo
+      enddo
+
+      call prinf('norder=*',norder,1)
+      call prinf('n=*',n,1)
       call formmatbac(amattmp,norder,n,srcinfo,h,transmission_neu,
      1    dpars,zpars,ipars)
   
