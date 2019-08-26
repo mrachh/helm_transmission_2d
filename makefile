@@ -106,7 +106,7 @@ examples/trans:
 
 
 clean: objclean
-	rm -f examples/ext_dir_solver examples/trans_solvr
+	rm -f examples/ext_dir_solver examples/trans_solver
 
 objclean: 
 	rm -f $(OBJS) 
