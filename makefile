@@ -12,7 +12,7 @@
 CC=gcc
 FC=gfortran
 
-FFLAGS= -fPIC -O3 -march=native -funroll-loops  
+FFLAGS= -fPIC -O3 -march=native -funroll-loops -fdefault-integer-8 -finteger-4-integer-8 
 CFLAGS= -std=c99 
 CFLAGS+= $(FFLAGS) 
 
@@ -22,13 +22,13 @@ LIBS = -lm
 
 # flags for MATLAB MEX compilation..
 MFLAGS=-largeArrayDims -lgfortran -DMWF77_UNDERSCORE1 -lm  -ldl
-MWFLAGS=-c99complex 
+MWFLAGS=-c99complex -i8 
 
 # location of MATLAB's mex compiler
 MEX=mex
 
 # For experts, location of Mwrap executable
-MWRAP=../../mwrap-0.33/mwrap
+MWRAP=../../mwrap/mwrap
 
 
 # For your OS, override the above by placing make variables in make.inc
