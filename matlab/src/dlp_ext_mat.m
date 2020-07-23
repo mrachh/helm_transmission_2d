@@ -1,5 +1,11 @@
 function [xmat] = dlp_ext_mat(zk,norder,h,srcinfo)
 %
+%  Representation:
+%    u = D_{k}[\sigma]
+%
+%  Data returned:
+%    Dirichlet data (u)
+%
 %
 %  Input: 
 %    zk - Helmholtz parameter

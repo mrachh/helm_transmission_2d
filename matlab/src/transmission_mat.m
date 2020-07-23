@@ -1,6 +1,17 @@
 function [xmat] = transmission_mat(zks,a,b,norder,h,srcinfo)
 %
 %
+%  Representation
+%    u_{i}  = -(1/b_{i}) S_{k_{i}}[\sigma] + \frac{1}{b_{i}} D_{k_{i}}[\mu]
+%    
+%  PDE 
+%
+%  [au]/q = f/q, [b du/dn] = g
+%  q = 0.5*(a_{1}/b_{1} + a_{2}/b_{2})
+%
+%  Unknown ordering \sigma_{1},\mu_{1},\sigma_{2},\mu_{2}....
+%  Output ordering [au]/q_{1}, [b du/dn]_{1}, [au]/q_{2}, [b du/dn]_{2}...
+%
 %  Input: 
 %    zks(2) - complex
 %       Helmholtz parameters

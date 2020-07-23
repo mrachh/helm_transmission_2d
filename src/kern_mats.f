@@ -140,6 +140,111 @@ c
 c
 c
 c
+
+      subroutine sprime_ext_mat(n,norder,h,srcinfo,zpars,xmat)
+c
+c        this subroutine constructs the discretization
+c        matrix corresponding to the exterior limit
+c        of the neumann data for the single layer potential 
+c
+c        input:
+c         n - number of discretization points
+c         norder - order of alpert quadrature
+c         h - 2*pi/n
+c           spacing in parameter space
+c         srcinfo - double (5,n)
+c           boundary discretization info
+c           srcinfo(1:2,:) - xy locations
+c           srcinfo(3:4,:) - normal info
+c           srcinfo(5,:) - dsdt
+c         zpars(1) - complex *16
+c           zpars(1) = zk = Helmholtz parameter
+c 
+c        output:
+c          xmat(n,n) - complex *16
+c            helmholtz combined field exterior limit 
+
+      implicit none
+      integer n,norder,i
+      real *8 srcinfo(5,n),dpars,h
+      integer ipars
+      complex *16 zpars,xmat(n,n)
+      external sprime
+
+      call formmatbac(xmat,norder,n,srcinfo,h,sprime,dpars,zpars,ipars)
+
+      do i=1,n
+        xmat(i,i) = xmat(i,i) - 0.5d0
+      enddo
+      
+
+      return
+      end
+c
+c
+c
+c
+c
+c
+c
+c
+c
+c
+
+      subroutine ddiff_neu_mat(n,norder,h,srcinfo,zpars,xmat)
+c
+c        this subroutine constructs the discretization
+c        matrix corresponding to the exterior limit
+c        of the neumann data for the difference of two double
+c        layer potentials
+c
+c        D_{k1}-D_{k2}
+c
+c        input:
+c         n - number of discretization points
+c         norder - order of alpert quadrature
+c         h - 2*pi/n
+c           spacing in parameter space
+c         srcinfo - double (5,n)
+c           boundary discretization info
+c           srcinfo(1:2,:) - xy locations
+c           srcinfo(3:4,:) - normal info
+c           srcinfo(5,:) - dsdt
+c         zpars(2) - complex *16
+c           zpars(1) = k1 = Helmholtz parameter
+c           zpars(2) = k2 = Helmholtz parameter 2 
+c 
+c        output:
+c          xmat(n,n) - complex *16
+c            helmholtz combined field exterior limit 
+
+      implicit none
+      integer n,norder,i
+      real *8 srcinfo(5,n),dpars,h
+      integer ipars
+      complex *16 zpars(2),xmat(n,n)
+      complex *16 zpars_tmp(6)
+      external transmission_neu 
+
+
+      zpars_tmp(1) = zpars(1)
+      zpars_tmp(2) = zpars(2)
+      zpars_tmp(3) = 0
+      zpars_tmp(4) = 0
+      zpars_tmp(5) = 1
+      zpars_tmp(6) = -1
+      call formmatbac(xmat,norder,n,srcinfo,h,transmission_neu,
+     1   dpars,zpars_tmp,ipars)
+
+
+      return
+      end
+c
+c
+c
+c
+c
+c
       subroutine trans_mat(n,norder,h,srcinfo,zks,a,b,xmat)
 c
 c        this subroutine constructs the discretization
@@ -304,7 +409,7 @@ c
 
       return
       end
-      
-
-      
-
+c
+c
+c
+c

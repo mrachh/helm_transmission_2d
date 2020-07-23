@@ -1,14 +1,14 @@
-function [xmat] = slp_mat(zk,norder,h,srcinfo)
+function [xmat] = sprime_ext_mat(zk,norder,h,srcinfo)
 %
 %  Representation:
-%    u = S_{k}[\sigma]
+%    u = S_{k} [\sigma] 
 %
 %  Data returned:
-%    Dirichlet data (u)
+%    Neumann data (du/dn)
 %
 %
 %  Input: 
-%    zk - Helmholtz parameter
+%    zk - Helmholtz paramter
 %    norder - Alpert quadrature rule order
 %    srcinfo(5,n) - source info
 %       srcinfo(1:2,:) - locations
@@ -19,13 +19,18 @@ function [xmat] = slp_mat(zk,norder,h,srcinfo)
 %
 %  Output:
 %    xmat - complex(n,n)
-%       slp matrix
+%       combined field matrix
 
   [m,n] = size(srcinfo);
   assert(m==5,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(n),0);
-  mex_id_ = 'slp_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])';
+  mex_id_ = 'sprime_ext_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])';
 [xmat] = kern_mats(mex_id_, n, norder, h, srcinfo, zk, xmat, 1, 1, 1, 5, n, 1, n, n);
 end
+%  
+%
+%
+%
+%  
 %
 %

@@ -1,5 +1,11 @@
 function [xmat] = comb_ext_mat(zpars,norder,h,srcinfo)
 %
+%  Representation:
+%    u = \alpha S_{k} [\sigma] + \beta D_{k}[\sigma]
+%
+%  Data returned:
+%    Dirichlet data (u)
+%
 %
 %  Input: 
 %    zpars(3) - 
@@ -24,6 +30,9 @@ function [xmat] = comb_ext_mat(zpars,norder,h,srcinfo)
   mex_id_ = 'comb_ext_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])';
 [xmat] = kern_mats(mex_id_, n, norder, h, srcinfo, zpars, xmat, 1, 1, 1, 5, n, 3, n, n);
 end
+%  
+%
+%
 %  
 %
 %

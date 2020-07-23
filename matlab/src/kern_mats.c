@@ -597,16 +597,22 @@ mxWrapReturnZDef   (mxWrapReturn_dcomplex, dcomplex,
 #define MWF77_slp_mat SLP_MAT
 #define MWF77_dlp_ext_mat DLP_EXT_MAT
 #define MWF77_comb_ext_mat COMB_EXT_MAT
+#define MWF77_sprime_ext_mat SPRIME_EXT_MAT
+#define MWF77_ddiff_neu_mat DDIFF_NEU_MAT
 #define MWF77_trans_mat TRANS_MAT
 #elif defined(MWF77_UNDERSCORE1)
 #define MWF77_slp_mat slp_mat_
 #define MWF77_dlp_ext_mat dlp_ext_mat_
 #define MWF77_comb_ext_mat comb_ext_mat_
+#define MWF77_sprime_ext_mat sprime_ext_mat_
+#define MWF77_ddiff_neu_mat ddiff_neu_mat_
 #define MWF77_trans_mat trans_mat_
 #else /* f2c convention */
 #define MWF77_slp_mat slp_mat__
 #define MWF77_dlp_ext_mat dlp_ext_mat__
 #define MWF77_comb_ext_mat comb_ext_mat__
+#define MWF77_sprime_ext_mat sprime_ext_mat__
+#define MWF77_ddiff_neu_mat ddiff_neu_mat__
 #define MWF77_trans_mat trans_mat__
 #endif
 
@@ -621,13 +627,15 @@ extern "C" { /* Prevent C++ name mangling */
 MWF77_RETURN MWF77_slp_mat(size_t*, size_t*, double*, double*, dcomplex*, dcomplex*);
 MWF77_RETURN MWF77_dlp_ext_mat(size_t*, size_t*, double*, double*, dcomplex*, dcomplex*);
 MWF77_RETURN MWF77_comb_ext_mat(size_t*, size_t*, double*, double*, dcomplex*, dcomplex*);
+MWF77_RETURN MWF77_sprime_ext_mat(size_t*, size_t*, double*, double*, dcomplex*, dcomplex*);
+MWF77_RETURN MWF77_ddiff_neu_mat(size_t*, size_t*, double*, double*, dcomplex*, dcomplex*);
 MWF77_RETURN MWF77_trans_mat(size_t*, size_t*, double*, double*, dcomplex*, dcomplex*, dcomplex*, dcomplex*);
 
 #ifdef __cplusplus
 } /* end extern C */
 #endif
 
-/* ---- kern_mats.mw: 26 ----
+/* ---- kern_mats.mw: 32 ----
  * slp_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[1] zk, inout dcomplex[n, n] xmat);
  */
 static const char* stubids1_ = "slp_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
@@ -739,7 +747,7 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 50 ----
+/* ---- kern_mats.mw: 62 ----
  * dlp_ext_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[1] zk, inout dcomplex[n, n] xmat);
  */
 static const char* stubids2_ = "dlp_ext_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
@@ -851,7 +859,7 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 78 ----
+/* ---- kern_mats.mw: 96 ----
  * comb_ext_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[3] zpars, inout dcomplex[n, n] xmat);
  */
 static const char* stubids3_ = "comb_ext_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
@@ -963,12 +971,236 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 109 ----
- * trans_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[2] zks, dcomplex[2] a, dcomplex[2] b, inout dcomplex[nsys, nsys] xmat);
+/* ---- kern_mats.mw: 130 ----
+ * sprime_ext_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[1] zk, inout dcomplex[n, n] xmat);
  */
-static const char* stubids4_ = "trans_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], i dcomplex[x], i dcomplex[x], io dcomplex[xx])";
+static const char* stubids4_ = "sprime_ext_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
 
 void mexStub4(int nlhs, mxArray* plhs[],
+              int nrhs, const mxArray* prhs[])
+{
+    const char* mw_err_txt_ = 0;
+    size_t*     in0_ =0; /* n          */
+    size_t*     in1_ =0; /* norder     */
+    double*     in2_ =0; /* h          */
+    double*     in3_ =0; /* srcinfo    */
+    dcomplex*   in4_ =0; /* zk         */
+    dcomplex*   in5_ =0; /* xmat       */
+    mwSize      dim6_;   /* 1          */
+    mwSize      dim7_;   /* 1          */
+    mwSize      dim8_;   /* 1          */
+    mwSize      dim9_;   /* 5          */
+    mwSize      dim10_;   /* n          */
+    mwSize      dim11_;   /* 1          */
+    mwSize      dim12_;   /* n          */
+    mwSize      dim13_;   /* n          */
+
+    dim6_ = (mwSize) mxWrapGetScalar(prhs[6], &mw_err_txt_);
+    dim7_ = (mwSize) mxWrapGetScalar(prhs[7], &mw_err_txt_);
+    dim8_ = (mwSize) mxWrapGetScalar(prhs[8], &mw_err_txt_);
+    dim9_ = (mwSize) mxWrapGetScalar(prhs[9], &mw_err_txt_);
+    dim10_ = (mwSize) mxWrapGetScalar(prhs[10], &mw_err_txt_);
+    dim11_ = (mwSize) mxWrapGetScalar(prhs[11], &mw_err_txt_);
+    dim12_ = (mwSize) mxWrapGetScalar(prhs[12], &mw_err_txt_);
+    dim13_ = (mwSize) mxWrapGetScalar(prhs[13], &mw_err_txt_);
+
+    if (mxGetM(prhs[0])*mxGetN(prhs[0]) != dim6_) {
+        mw_err_txt_ = "Bad argument size: n";        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[1])*mxGetN(prhs[1]) != dim7_) {
+        mw_err_txt_ = "Bad argument size: norder";        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[2])*mxGetN(prhs[2]) != dim8_) {
+        mw_err_txt_ = "Bad argument size: h";        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[3]) != dim9_ ||
+        mxGetN(prhs[3]) != dim10_) {
+        mw_err_txt_ = "Bad argument size: srcinfo";
+        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[4])*mxGetN(prhs[4]) != dim11_) {
+        mw_err_txt_ = "Bad argument size: zk";        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[5]) != dim12_ ||
+        mxGetN(prhs[5]) != dim13_) {
+        mw_err_txt_ = "Bad argument size: xmat";
+        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[0])*mxGetN(prhs[0]) != 0) {
+        in0_ = mxWrapGetArray_size_t(prhs[0], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in0_ = NULL;
+    if (mxGetM(prhs[1])*mxGetN(prhs[1]) != 0) {
+        in1_ = mxWrapGetArray_size_t(prhs[1], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in1_ = NULL;
+    if (mxGetM(prhs[2])*mxGetN(prhs[2]) != 0) {
+        in2_ = mxWrapGetArray_double(prhs[2], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in2_ = NULL;
+    if (mxGetM(prhs[3])*mxGetN(prhs[3]) != 0) {
+        in3_ = mxWrapGetArray_double(prhs[3], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in3_ = NULL;
+    if (mxGetM(prhs[4])*mxGetN(prhs[4]) != 0) {
+        in4_ = mxWrapGetArray_dcomplex(prhs[4], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in4_ = NULL;
+    if (mxGetM(prhs[5])*mxGetN(prhs[5]) != 0) {
+        in5_ = mxWrapGetArray_dcomplex(prhs[5], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in5_ = NULL;
+    if (mexprofrecord_)
+        mexprofrecord_[4]++;
+    MWF77_sprime_ext_mat(in0_, in1_, in2_, in3_, in4_, in5_);
+    plhs[0] = mxCreateDoubleMatrix(dim12_, dim13_, mxCOMPLEX);
+    mxWrapCopy_dcomplex(plhs[0], in5_, dim12_*dim13_);
+
+mw_err_label:
+    if (in0_)  mxFree(in0_);
+    if (in1_)  mxFree(in1_);
+    if (in4_)  mxFree(in4_);
+    if (in5_)  mxFree(in5_);
+    if (mw_err_txt_)
+        mexErrMsgTxt(mw_err_txt_);
+}
+
+/* ---- kern_mats.mw: 167 ----
+ * ddiff_neu_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[2] zpars, inout dcomplex[n, n] xmat);
+ */
+static const char* stubids5_ = "ddiff_neu_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
+
+void mexStub5(int nlhs, mxArray* plhs[],
+              int nrhs, const mxArray* prhs[])
+{
+    const char* mw_err_txt_ = 0;
+    size_t*     in0_ =0; /* n          */
+    size_t*     in1_ =0; /* norder     */
+    double*     in2_ =0; /* h          */
+    double*     in3_ =0; /* srcinfo    */
+    dcomplex*   in4_ =0; /* zpars      */
+    dcomplex*   in5_ =0; /* xmat       */
+    mwSize      dim6_;   /* 1          */
+    mwSize      dim7_;   /* 1          */
+    mwSize      dim8_;   /* 1          */
+    mwSize      dim9_;   /* 5          */
+    mwSize      dim10_;   /* n          */
+    mwSize      dim11_;   /* 2          */
+    mwSize      dim12_;   /* n          */
+    mwSize      dim13_;   /* n          */
+
+    dim6_ = (mwSize) mxWrapGetScalar(prhs[6], &mw_err_txt_);
+    dim7_ = (mwSize) mxWrapGetScalar(prhs[7], &mw_err_txt_);
+    dim8_ = (mwSize) mxWrapGetScalar(prhs[8], &mw_err_txt_);
+    dim9_ = (mwSize) mxWrapGetScalar(prhs[9], &mw_err_txt_);
+    dim10_ = (mwSize) mxWrapGetScalar(prhs[10], &mw_err_txt_);
+    dim11_ = (mwSize) mxWrapGetScalar(prhs[11], &mw_err_txt_);
+    dim12_ = (mwSize) mxWrapGetScalar(prhs[12], &mw_err_txt_);
+    dim13_ = (mwSize) mxWrapGetScalar(prhs[13], &mw_err_txt_);
+
+    if (mxGetM(prhs[0])*mxGetN(prhs[0]) != dim6_) {
+        mw_err_txt_ = "Bad argument size: n";        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[1])*mxGetN(prhs[1]) != dim7_) {
+        mw_err_txt_ = "Bad argument size: norder";        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[2])*mxGetN(prhs[2]) != dim8_) {
+        mw_err_txt_ = "Bad argument size: h";        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[3]) != dim9_ ||
+        mxGetN(prhs[3]) != dim10_) {
+        mw_err_txt_ = "Bad argument size: srcinfo";
+        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[4])*mxGetN(prhs[4]) != dim11_) {
+        mw_err_txt_ = "Bad argument size: zpars";        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[5]) != dim12_ ||
+        mxGetN(prhs[5]) != dim13_) {
+        mw_err_txt_ = "Bad argument size: xmat";
+        goto mw_err_label;
+    }
+
+    if (mxGetM(prhs[0])*mxGetN(prhs[0]) != 0) {
+        in0_ = mxWrapGetArray_size_t(prhs[0], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in0_ = NULL;
+    if (mxGetM(prhs[1])*mxGetN(prhs[1]) != 0) {
+        in1_ = mxWrapGetArray_size_t(prhs[1], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in1_ = NULL;
+    if (mxGetM(prhs[2])*mxGetN(prhs[2]) != 0) {
+        in2_ = mxWrapGetArray_double(prhs[2], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in2_ = NULL;
+    if (mxGetM(prhs[3])*mxGetN(prhs[3]) != 0) {
+        in3_ = mxWrapGetArray_double(prhs[3], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in3_ = NULL;
+    if (mxGetM(prhs[4])*mxGetN(prhs[4]) != 0) {
+        in4_ = mxWrapGetArray_dcomplex(prhs[4], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in4_ = NULL;
+    if (mxGetM(prhs[5])*mxGetN(prhs[5]) != 0) {
+        in5_ = mxWrapGetArray_dcomplex(prhs[5], &mw_err_txt_);
+        if (mw_err_txt_)
+            goto mw_err_label;
+    } else
+        in5_ = NULL;
+    if (mexprofrecord_)
+        mexprofrecord_[5]++;
+    MWF77_ddiff_neu_mat(in0_, in1_, in2_, in3_, in4_, in5_);
+    plhs[0] = mxCreateDoubleMatrix(dim12_, dim13_, mxCOMPLEX);
+    mxWrapCopy_dcomplex(plhs[0], in5_, dim12_*dim13_);
+
+mw_err_label:
+    if (in0_)  mxFree(in0_);
+    if (in1_)  mxFree(in1_);
+    if (in4_)  mxFree(in4_);
+    if (in5_)  mxFree(in5_);
+    if (mw_err_txt_)
+        mexErrMsgTxt(mw_err_txt_);
+}
+
+/* ---- kern_mats.mw: 212 ----
+ * trans_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[2] zks, dcomplex[2] a, dcomplex[2] b, inout dcomplex[nsys, nsys] xmat);
+ */
+static const char* stubids6_ = "trans_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], i dcomplex[x], i dcomplex[x], io dcomplex[xx])";
+
+void mexStub6(int nlhs, mxArray* plhs[],
               int nrhs, const mxArray* prhs[])
 {
     const char* mw_err_txt_ = 0;
@@ -1087,7 +1319,7 @@ void mexStub4(int nlhs, mxArray* plhs[],
     } else
         in7_ = NULL;
     if (mexprofrecord_)
-        mexprofrecord_[4]++;
+        mexprofrecord_[6]++;
     MWF77_trans_mat(in0_, in1_, in2_, in3_, in4_, in5_, in6_, in7_);
     plhs[0] = mxCreateDoubleMatrix(dim16_, dim17_, mxCOMPLEX);
     mxWrapCopy_dcomplex(plhs[0], in7_, dim16_*dim17_);
@@ -1124,12 +1356,16 @@ void mexFunction(int nlhs, mxArray* plhs[],
         mexStub3(nlhs,plhs, nrhs-1,prhs+1);
     else if (strcmp(id, stubids4_) == 0)
         mexStub4(nlhs,plhs, nrhs-1,prhs+1);
+    else if (strcmp(id, stubids5_) == 0)
+        mexStub5(nlhs,plhs, nrhs-1,prhs+1);
+    else if (strcmp(id, stubids6_) == 0)
+        mexStub6(nlhs,plhs, nrhs-1,prhs+1);
     else if (strcmp(id, "*profile on*") == 0) {
         if (!mexprofrecord_) {
-            mexprofrecord_ = (int*) malloc(5 * sizeof(int));
+            mexprofrecord_ = (int*) malloc(7 * sizeof(int));
             mexLock();
         }
-        memset(mexprofrecord_, 0, 5 * sizeof(int));
+        memset(mexprofrecord_, 0, 7 * sizeof(int));
     } else if (strcmp(id, "*profile off*") == 0) {
         if (mexprofrecord_) {
             free(mexprofrecord_);
@@ -1139,10 +1375,12 @@ void mexFunction(int nlhs, mxArray* plhs[],
     } else if (strcmp(id, "*profile report*") == 0) {
         if (!mexprofrecord_)
             mexPrintf("Profiler inactive\n");
-        mexPrintf("%d calls to kern_mats.mw:26\n", mexprofrecord_[1]);
-        mexPrintf("%d calls to kern_mats.mw:50\n", mexprofrecord_[2]);
-        mexPrintf("%d calls to kern_mats.mw:78\n", mexprofrecord_[3]);
-        mexPrintf("%d calls to kern_mats.mw:109\n", mexprofrecord_[4]);
+        mexPrintf("%d calls to kern_mats.mw:32\n", mexprofrecord_[1]);
+        mexPrintf("%d calls to kern_mats.mw:62\n", mexprofrecord_[2]);
+        mexPrintf("%d calls to kern_mats.mw:96\n", mexprofrecord_[3]);
+        mexPrintf("%d calls to kern_mats.mw:130\n", mexprofrecord_[4]);
+        mexPrintf("%d calls to kern_mats.mw:167\n", mexprofrecord_[5]);
+        mexPrintf("%d calls to kern_mats.mw:212\n", mexprofrecord_[6]);
     } else if (strcmp(id, "*profile log*") == 0) {
         FILE* logfp;
         if (nrhs != 2 || mxGetString(prhs[1], id, sizeof(id)) != 0)
@@ -1152,10 +1390,12 @@ void mexFunction(int nlhs, mxArray* plhs[],
             mexErrMsgTxt("Cannot open log for output");
         if (!mexprofrecord_)
             fprintf(logfp, "Profiler inactive\n");
-        fprintf(logfp, "%d calls to kern_mats.mw:26\n", mexprofrecord_[1]);
-        fprintf(logfp, "%d calls to kern_mats.mw:50\n", mexprofrecord_[2]);
-        fprintf(logfp, "%d calls to kern_mats.mw:78\n", mexprofrecord_[3]);
-        fprintf(logfp, "%d calls to kern_mats.mw:109\n", mexprofrecord_[4]);
+        fprintf(logfp, "%d calls to kern_mats.mw:32\n", mexprofrecord_[1]);
+        fprintf(logfp, "%d calls to kern_mats.mw:62\n", mexprofrecord_[2]);
+        fprintf(logfp, "%d calls to kern_mats.mw:96\n", mexprofrecord_[3]);
+        fprintf(logfp, "%d calls to kern_mats.mw:130\n", mexprofrecord_[4]);
+        fprintf(logfp, "%d calls to kern_mats.mw:167\n", mexprofrecord_[5]);
+        fprintf(logfp, "%d calls to kern_mats.mw:212\n", mexprofrecord_[6]);
         fclose(logfp);
     } else
         mexErrMsgTxt("Unknown identifier");
