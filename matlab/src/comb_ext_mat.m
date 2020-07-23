@@ -21,7 +21,7 @@ function [xmat] = comb_ext_mat(zpars,norder,h,srcinfo)
   [m,n] = size(srcinfo);
   assert(m==5,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(n),0);
-  mex_id_ = 'comb_ext_mat(i int[x], i int[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])';
+  mex_id_ = 'comb_ext_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])';
 [xmat] = kern_mats(mex_id_, n, norder, h, srcinfo, zpars, xmat, 1, 1, 1, 5, n, 3, n, n);
 end
 %  

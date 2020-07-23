@@ -1,6 +1,8 @@
 clear;
 clc;
 
+addpath('./src')
+
 %% Generate geometry and right hand side for dirichlet problem
 n = 200;
 src = [0.01;-0.07];

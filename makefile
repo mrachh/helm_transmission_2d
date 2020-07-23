@@ -12,7 +12,7 @@
 CC=gcc
 FC=gfortran
 
-FFLAGS= -fPIC -O3 -march=native -funroll-loops -fdefault-integer-8 -finteger-4-integer-8 
+FFLAGS= -fPIC -O3 -march=native -funroll-loops -std=legacy 
 CFLAGS= -std=c99 
 CFLAGS+= $(FFLAGS) 
 
@@ -21,14 +21,14 @@ CLINK = -lgfortran -lm -ldl
 LIBS = -lm
 
 # flags for MATLAB MEX compilation..
-MFLAGS=-largeArrayDims -lgfortran -DMWF77_UNDERSCORE1 -lm  -ldl
+MFLAGS=-largeArrayDims -lgfortran -DMWF77_UNDERSCORE1 -lm  -ldl 
 MWFLAGS=-c99complex -i8 
 
 # location of MATLAB's mex compiler
 MEX=mex
 
 # For experts, location of Mwrap executable
-MWRAP=../../mwrap/mwrap
+MWRAP=../../../mwrap/mwrap
 
 
 # For your OS, override the above by placing make variables in make.inc
@@ -77,18 +77,18 @@ MWRAPFILE2 = helm_kernels
 GATEWAY = $(MWRAPFILE)
 GATEWAY2 = $(MWRAPFILE2)
 
-matlab:	$(STATICLIB) matlab/$(GATEWAY).c matlab/$(GATEWAY2).c
-	$(MEX) matlab/$(GATEWAY).c $(STATICLIB) $(MFLAGS) -output matlab/kern_mats $(MEX_LIBS);
-	$(MEX) matlab/$(GATEWAY2).c $(STATICLIB) $(MFLAGS) -output matlab/helm_kernels $(MEXLIBS);
+matlab:	$(STATICLIB) matlab/src/$(GATEWAY).c matlab/src/$(GATEWAY2).c
+	$(MEX) matlab/src/$(GATEWAY).c $(STATICLIB) $(MFLAGS) -output matlab/src/kern_mats $(MEX_LIBS);
+	$(MEX) matlab/src/$(GATEWAY2).c $(STATICLIB) $(MFLAGS) -output matlab/src/helm_kernels $(MEXLIBS);
 
 
 mex:  $(STATICLIB)
-	cd matlab; $(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY) -mb $(MWRAPFILE).mw;\
+	cd matlab; cd src; $(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY) -mb $(MWRAPFILE).mw;\
 	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY) -c $(GATEWAY).c $(MWRAPFILE).mw;\
-	$(MEX) $(GATEWAY).c ../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE) $(MEX_LIBS); \
+	$(MEX) $(GATEWAY).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE) $(MEX_LIBS); \
 	$(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY2) -mb $(MWRAPFILE2).mw;\
 	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY2) -c $(GATEWAY2).c $(MWRAPFILE2).mw;\
-	$(MEX) $(GATEWAY2).c ../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE2) $(MEX_LIBS);
+	$(MEX) $(GATEWAY2).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE2) $(MEX_LIBS);
 
 #
 ##  examples

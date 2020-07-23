@@ -1,6 +1,7 @@
 clear;
 clc;
 
+addpath('./src')
 %
 %  This is a test script for solving Helmholtz transmission 
 % problem with boundary conditions
