@@ -29,7 +29,7 @@ function [xmat] = rpcomb_dir_ext_mat(zpars,norder,h,srcinfo)
   assert(m==5,'srcinfo must be of shape (5,n)');
   zk = zpars(1);
   smat = slp_mat(zk,norder,h,srcinfo);
-  zk2 = 1j*zk;
+  zk2 = 1j*abs(zk);
   sikmat = slp_mat(zk2,norder,h,srcinfo);
   dmat = dlp_ext_mat(zk,norder,h,srcinfo);
   xmat=  smat+1j*zpars(2)*dmat*sikmat;

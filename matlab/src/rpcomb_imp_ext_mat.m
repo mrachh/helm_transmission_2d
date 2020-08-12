@@ -32,7 +32,7 @@ function [xmat] = rpcomb_imp_ext_mat(zpars,norder,h,srcinfo)
   eta = zpars(3);
   alpha = zpars(2);
   smat = slp_mat(zk,norder,h,srcinfo);
-  zk2 = 1j*zk;
+  zk2 = 1j*abs(zk);
   sikmat = slp_mat(zk2,norder,h,srcinfo);
   dmat = dlp_ext_mat(zk,norder,h,srcinfo);
   xmat=  smat+1j*alpha*dmat*sikmat;
@@ -42,7 +42,7 @@ function [xmat] = rpcomb_imp_ext_mat(zpars,norder,h,srcinfo)
   spikmat = spikmat + 0.5*eye(n);
   zpars2 = complex(zeros(2,1));
   zpars2(1) = zk;
-  zpars2(2) = 1j*zk;
+  zpars2(2) = 1j*abs(zk);
   ddiffmat = ddiff_neu_mat(zpars2,norder,h,srcinfo);
   xmat = xmat+1j*zk*eta*(spmat + 1j*alpha*(ddiffmat*sikmat ...
      +spikmat*spikmat-eye(n)/4));

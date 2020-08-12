@@ -14,13 +14,13 @@ a = 1.1; b=1.3;
 [srcinfo,h] = ellipse(a,b,n);
 
 
-zk = complex(1.1);
+zk = complex(1.1,0.1);
 uex = helm_c_p(zk,src,targ);
 uin = helm_c_p(zk,src,srcinfo);
 dudnin = helm_c_gn(zk,src,srcinfo);
 
 alpha = 2;
-zk2 = 1j*zk;
+zk2 = 1j*abs(zk);
 norder = 16;
 sikmat = slp_mat(zk2,norder,h,srcinfo);
 

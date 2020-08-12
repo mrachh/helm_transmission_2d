@@ -172,6 +172,77 @@ end
 %
 %
 %
+%
+@function [xmat] = ddiff0_neu_mat(zpars,norder,h,srcinfo)
+%
+%  Representation:
+%    u = D_{k1} - D_{0} [\sigma] 
+%
+%  Data returned:
+%    Neumann data (du/dn)
+%
+%
+%  Input: 
+%    zpars(1) - 
+%      zpars(1) - Helmholtz paramter (k1)
+%    norder - Alpert quadrature rule order
+%    srcinfo(5,n) - source info
+%       srcinfo(1:2,:) - locations
+%       srcinfo(3:4,:) - normals
+%       srcinfo(5,:) - dsdt
+%
+%    h - step size in parameter space
+%
+%  Output:
+%    xmat - complex(n,n)
+%      d_{k}' - D_{0}'
+%       
+
+  [m,n] = size(srcinfo);
+  assert(m==5,'srcinfo must be of shape (5,n)');
+  xmat = complex(zeros(n),0);
+  #FORTRAN ddiff0_neu_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, dcomplex[1] zpars, inout dcomplex[n,n] xmat);
+end
+%  
+%
+%
+%
+%
+@function [xmat] = lap_dlp_mat(norder,h,srcinfo)
+%
+%  Representation:
+%    u = D_{0} [\sigma] 
+%
+%  Data returned:
+%    dirichlet data (du/dn)
+%
+%
+%  Input: 
+%    norder - Alpert quadrature rule order
+%    srcinfo(5,n) - source info
+%       srcinfo(1:2,:) - locations
+%       srcinfo(3:4,:) - normals
+%       srcinfo(5,:) - dsdt
+%
+%    h - step size in parameter space
+%
+%  Output:
+%    xmat - complex(n,n)
+%      D_{0}
+%       
+
+  [m,n] = size(srcinfo);
+  assert(m==5,'srcinfo must be of shape (5,n)');
+  xmat = complex(zeros(n),0);
+  #FORTRAN lap_dlp_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, inout dcomplex[n,n] xmat);
+end
+%  
+%
+%
+%
+%
+%
+%
 @function [xmat] = transmission_mat(zks,a,b,norder,h,srcinfo)
 %
 %

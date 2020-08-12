@@ -30,13 +30,13 @@ function [xmat] = rpcomb_neu_ext_mat(zpars,norder,h,srcinfo)
   zk = zpars(1);
   alpha = zpars(2);
   spmat = sprime_ext_mat(zk,norder,h,srcinfo);
-  zk2 = 1j*zk;
+  zk2 = 1j*abs(zk);
   spikmat = sprime_ext_mat(zk2,norder,h,srcinfo);
   spikmat = spikmat + 0.5*eye(n);
   sikmat = slp_mat(zk2,norder,h,srcinfo);
   zpars2 = complex(zeros(2,1));
   zpars2(1) = zk;
-  zpars2(2) = 1j*zk;
+  zpars2(2) = 1j*abs(zk);
   ddiffmat = ddiff_neu_mat(zpars2,norder,h,srcinfo);
   xmat=  spmat + 1j*alpha*(ddiffmat*sikmat ...
      +spikmat*spikmat-eye(n)/4);

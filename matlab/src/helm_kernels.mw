@@ -34,6 +34,27 @@ end
 end
 %
 %
+%
+%
+%
+%------------------------------------------------------
+@function [ux,uy] = helm_c_g(zk,src,targ)
+%
+%   This subroutine evaluates the kernel i/4 nx \cdot \nabla_{x} H_{0}(k|x-y|)
+%   x = targ(1:2), nx = targ(3:4), y = src
+%  
+%
+  [n0,n] = size(src);
+  [n1,m] = size(targ);
+
+  src0 = src(1:2,:);
+  targ0 = targ(1:2,:);
+
+  ux = complex(zeros(m,n));
+  uy = complex(zeros(m,n));
+  # FORTRAN helm_c_g(int[1] n, double[2,n] src0, int[1] m, double[2,m] targ0, dcomplex[1] zk, inout dcomplex[m,n] ux, inout dcomplex[m,n] uy);
+end
+%
 %------------------------------------------------------
 @function [u] = helm_d_p(zk,src,targ)
 %

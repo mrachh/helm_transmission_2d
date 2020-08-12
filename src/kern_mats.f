@@ -244,6 +244,94 @@ c
 c
 c
 c
+
+      subroutine ddiff0_neu_mat(n,norder,h,srcinfo,zk,xmat)
+c
+c        this subroutine constructs the discretization
+c        matrix corresponding to the exterior limit
+c        of the neumann data for the difference 
+c
+c        D_{k}'-D_{0}'
+c
+c        input:
+c         n - number of discretization points
+c         norder - order of alpert quadrature
+c         h - 2*pi/n
+c           spacing in parameter space
+c         srcinfo - double (5,n)
+c           boundary discretization info
+c           srcinfo(1:2,:) - xy locations
+c           srcinfo(3:4,:) - normal info
+c           srcinfo(5,:) - dsdt
+c         zk - complex *16
+c           k = Helmholtz parameter
+c 
+c        output:
+c          xmat(n,n) - complex *16
+c            helmholtz combined field exterior limit 
+
+      implicit none
+      integer n,norder,i
+      real *8 srcinfo(5,n),dpars,h
+      integer ipars
+      complex *16 zk,xmat(n,n)
+      external dprime0_diff 
+
+      call formmatbac(xmat,norder,n,srcinfo,h,dprime0_diff,
+     1   dpars,zk,ipars)
+
+      return
+      end
+c
+c
+c
+c
+
+      subroutine lap_dlp_mat(n,norder,h,srcinfo,xmat)
+c
+c        this subroutine constructs the discretization
+c        matrix corresponding to the exterior limit
+c        of the dirichlet data for 
+c       
+c        D_{0}
+c
+c        input:
+c         n - number of discretization points
+c         norder - order of alpert quadrature
+c         h - 2*pi/n
+c           spacing in parameter space
+c         srcinfo - double (5,n)
+c           boundary discretization info
+c           srcinfo(1:2,:) - xy locations
+c           srcinfo(3:4,:) - normal info
+c           srcinfo(5,:) - dsdt
+c 
+c        output:
+c          xmat(n,n) - complex *16
+c            Laplace double layer discretization 
+
+      implicit none
+      integer n,norder,i
+      real *8 srcinfo(5,n),dpars,h
+      integer ipars
+      complex *16 xmat(n,n),zpars
+      external lap_dlp 
+
+      call formmatbac(xmat,norder,n,srcinfo,h,lap_dlp,
+     1   dpars,zpars,ipars)
+
+      do i=1,n
+        xmat(i,i) = xmat(i,i) + 0.5d0
+      enddo
+
+
+      return
+      end
+c
+c
+c
+c
+c
 c
       subroutine trans_mat(n,norder,h,srcinfo,zks,a,b,xmat)
 c

@@ -41,7 +41,7 @@ MWRAP=../../../mwrap/mwrap
  
 # Helmholtz objects
 OBJS = src/hank103.o src/prini.o src/helm_kernels.o  \
-	src/formsysmatbac.o src/kern_mats.o 
+	src/formsysmatbac.o src/kern_mats.o src/lap_kernels.o 
 
 .PHONY: usage examples matlab debug
 
@@ -74,12 +74,15 @@ $(STATICLIB): $(OBJS)
 # matlab..
 MWRAPFILE = kern_mats
 MWRAPFILE2 = helm_kernels
+MWRAPFILE3 = lap_kernels
 GATEWAY = $(MWRAPFILE)
 GATEWAY2 = $(MWRAPFILE2)
+GATEWAY3 = $(MWRAPFILE3)
 
 matlab:	$(STATICLIB) matlab/src/$(GATEWAY).c matlab/src/$(GATEWAY2).c
 	$(MEX) matlab/src/$(GATEWAY).c $(STATICLIB) $(MFLAGS) -output matlab/src/kern_mats $(MEX_LIBS);
 	$(MEX) matlab/src/$(GATEWAY2).c $(STATICLIB) $(MFLAGS) -output matlab/src/helm_kernels $(MEXLIBS);
+	$(MEX) matlab/src/$(GATEWAY3).c $(STATICLIB) $(MFLAGS) -output matlab/src/lap_kernels $(MEXLIBS);
 
 
 mex:  $(STATICLIB)
@@ -88,7 +91,10 @@ mex:  $(STATICLIB)
 	$(MEX) $(GATEWAY).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE) $(MEX_LIBS); \
 	$(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY2) -mb $(MWRAPFILE2).mw;\
 	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY2) -c $(GATEWAY2).c $(MWRAPFILE2).mw;\
-	$(MEX) $(GATEWAY2).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE2) $(MEX_LIBS);
+	$(MEX) $(GATEWAY2).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE2) $(MEX_LIBS);\
+	$(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY3) -mb $(MWRAPFILE3).mw;\
+	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY3) -c $(GATEWAY3).c $(MWRAPFILE3).mw;\
+	$(MEX) $(GATEWAY3).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE3) $(MEX_LIBS);
 
 #
 ##  examples
