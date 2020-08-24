@@ -24,7 +24,7 @@
       lsave = 0
  
       do i=1,3
-        nlarge = 4*2**(i)*n
+        nlarge = 32*2**(i)*n
         lenw = 10*nlarge*n + 10000
         allocate(work(lenw))
         curvelen = 0
