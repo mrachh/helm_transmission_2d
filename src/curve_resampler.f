@@ -1,6 +1,6 @@
 
 
-      subroutine simple_curve_resampler_mem(n,xy,nb,nlarge,
+      subroutine simple_curve_resampler_mem(n,xy,nb,eps,nmax,nlarge,
      1   nout,lsave,lused,ier)
       implicit real *8 (a-h,o-z)
       integer n,nb
@@ -8,9 +8,11 @@
       integer, intent(out) :: nlarge,nout
 
       real *8, allocatable :: x0(:),y0(:),work(:),ts(:)
+      real *8, allocatable :: xver(:),yver(:)
 
       allocate(x0(n+1),y0(n+1))
       allocate(ts(n+1))
+      allocate(xver(n+1),yver(n+1))
 
       do i=1,n
         x0(i) = xy(1,i)
@@ -22,25 +24,45 @@
 
       lused = 0
       lsave = 0
+      ier = 0
+
+      epscheck = max(eps,1.0d-12)
  
-      do i=1,3
-        nlarge = 32*2**(i)*n
+      do ii=1,nmax
+        nlarge = 16*2**(ii)*n
         lenw = 10*nlarge*n + 10000
         allocate(work(lenw))
         curvelen = 0
         derr = 0
         nbl = 0
-        call rsblcurve(ier,x0,y0,n,nb,nlarge,
+        iert = 0
+        call rsblcurve(iert,x0,y0,n,nb,nlarge,
      1       curvelen,nbl,derr,ts,work,lenw,lsave,lused)
-        call prinf('i=*',i,1)
-        call prinf('lenw=*',lenw,1)
-        call prinf('ier=*',ier,1)
         nout = 2*nbl
+
+
+        if(iert.ne.0) goto 1111
+        erra = 0
+        ra = 0
+        do i=1,n
+          xver(i) = 0
+          yver(i) = 0
+          call eval_curve(ier,ts(i),work,xver(i),yver(i),dxt,dyt)
+          erra = erra + (xver(i)-xy(1,i))**2
+          ra = ra + xy(1,i)**2
+          erra = erra + (yver(i)-xy(2,i))**2
+          ra = ra + xy(2,i)**2
+        enddo
+        erra = sqrt(erra/ra)
+
+        if(erra.lt.epscheck) goto 1000 
+
+ 1111   continue        
         deallocate(work)
-        if(ier.eq.0) goto 1000
       enddo
 
-      ier = 4
+      if(iert.ne.0) ier = 4
+      if(iert.eq.0) ier = 2
  1000 continue      
 
 
@@ -78,9 +100,6 @@ c
       call rsblcurve(ier,x0,y0,n,nb,nlarge,curvelen,nbl,
      1   derr,ts,work,lenw,lsave0,lused)
 
-      print *, "lsave=",lsave
-      print *, "lsave0=",lsave0
-
       
       wsave(1:lsave) = work(1:lsave)
       
@@ -96,10 +115,25 @@ c
 
       return
       end
+c
+c
+c
+c
+c
+      subroutine eval_curve_multi(n,ts,lsave,wsave,binfo)
+      implicit real *8 (a-h,o-z)
+      integer n,lsave
+      real *8 ts(n),wsave(lsave),binfo(5,n)
 
+      do i=1,n
+        call eval_curve(ier,ts(i),wsave,binfo(1,i),binfo(2,i),dxt,dyt)
+        binfo(5,i) = sqrt(dxt**2 + dyt**2)
+        binfo(3,i) = dyt/binfo(5,i)
+        binfo(4,i) = -dxt/binfo(5,i)
+      enddo
 
-
-
+      return
+      end
 c
 c
 c

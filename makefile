@@ -77,14 +77,17 @@ $(STATICLIB): $(OBJS)
 MWRAPFILE = kern_mats
 MWRAPFILE2 = helm_kernels
 MWRAPFILE3 = lap_kernels
+MWRAPFILE4 = curve_resampler
 GATEWAY = $(MWRAPFILE)
 GATEWAY2 = $(MWRAPFILE2)
 GATEWAY3 = $(MWRAPFILE3)
+GATEWAY4 = $(MWRAPFILE4)
 
-matlab:	$(STATICLIB) matlab/src/$(GATEWAY).c matlab/src/$(GATEWAY2).c
+matlab:	$(STATICLIB) matlab/src/$(GATEWAY).c matlab/src/$(GATEWAY2).c matlab/src/$(GATEWAY3).c matlab/src/$(GATEWAY4).c
 	$(MEX) matlab/src/$(GATEWAY).c $(STATICLIB) $(MFLAGS) -output matlab/src/kern_mats $(MEX_LIBS);
 	$(MEX) matlab/src/$(GATEWAY2).c $(STATICLIB) $(MFLAGS) -output matlab/src/helm_kernels $(MEXLIBS);
 	$(MEX) matlab/src/$(GATEWAY3).c $(STATICLIB) $(MFLAGS) -output matlab/src/lap_kernels $(MEXLIBS);
+	$(MEX) matlab/src/$(GATEWAY4).c $(STATICLIB) $(MFLAGS) -output matlab/src/curve_resampler $(MEXLIBS);
 
 
 mex:  $(STATICLIB)
@@ -96,7 +99,10 @@ mex:  $(STATICLIB)
 	$(MEX) $(GATEWAY2).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE2) $(MEX_LIBS);\
 	$(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY3) -mb $(MWRAPFILE3).mw;\
 	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY3) -c $(GATEWAY3).c $(MWRAPFILE3).mw;\
-	$(MEX) $(GATEWAY3).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE3) $(MEX_LIBS);
+	$(MEX) $(GATEWAY3).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE3) $(MEX_LIBS); \
+	$(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY4) -mb $(MWRAPFILE4).mw;\
+	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY4) -c $(GATEWAY4).c $(MWRAPFILE4).mw;\
+	$(MEX) $(GATEWAY4).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE4) $(MEX_LIBS);
 
 #
 ##  examples

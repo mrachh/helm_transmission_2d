@@ -28,22 +28,28 @@ cc      enddo
 
 
       nb = 400
+      eps = 1.0d-12
 
       ierm = 0
-      call simple_curve_resampler_mem(n,xy,nb,nlarge,nout,lsave,
-     1   lused,ierm)
-      if(ierm.ne.0) then
+      nmax = 4
+      call simple_curve_resampler_mem(n,xy,nb,eps,nmax,nlarge,
+     1   nout,lsave,lused,ierm)
+      if(ierm.eq.4) then
         call 
      1     prinf('nb too small, resulting curve self intersecting*',i,0)
         call prinf('increase nb*',i,0)
+      else if(ierm.eq.2) then
+        call prinf('desired inteprolation accuracy not reached*',i,0)
+        call prinf('try increasing nmax*',i,0)
       endif
      
 
       call prinf('nb=*',nb,1)
       call prinf('nlarge=*',nlarge,1)
       call prinf('nout=*',nout,1)
-      call prinf('lsave=*',lsave,1)
-      call prinf('lused=*',lused,1)
+      print *, "lsave=",lsave
+      print *, "lused=",lused
+
 
 
       allocate(wsave(lsave))
