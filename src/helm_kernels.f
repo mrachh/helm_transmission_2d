@@ -330,9 +330,9 @@ c
 
       d2gdx2 = rinv**2*(1.0d0 - 2.0d0*xd*xd)
       d2gdy2 = rinv**2*(1.0d0 - 2.0d0*yd*yd)
-      d2gdxdy = -rinv**2*xd*yd
+      d2gdxdy = -rinv**2*xd*yd*2.0d0
 
-      gd1 = -over2pi*(d2gdx2*srcinfo(3)*targinfo(3) +
+      gd1 = over2pi*(d2gdx2*srcinfo(3)*targinfo(3) +
      1    d2gdxdy*(srcinfo(3)*targinfo(4) + srcinfo(4)*targinfo(3)) + 
      2    d2gdy2*srcinfo(4)*targinfo(4))
 

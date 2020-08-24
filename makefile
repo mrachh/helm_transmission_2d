@@ -12,7 +12,7 @@
 CC=gcc
 FC=gfortran
 
-FFLAGS= -fPIC -O3 -march=native -funroll-loops -std=legacy 
+FFLAGS= -fPIC -O3 -march=native -funroll-loops -std=legacy -w 
 CFLAGS= -std=c99 
 CFLAGS+= $(FFLAGS) 
 
@@ -41,7 +41,9 @@ MWRAP=../../../mwrap/mwrap
  
 # Helmholtz objects
 OBJS = src/hank103.o src/prini.o src/helm_kernels.o  \
-	src/formsysmatbac.o src/kern_mats.o src/lap_kernels.o 
+	src/formsysmatbac.o src/kern_mats.o src/lap_kernels.o \
+	src/durdec.o src/corrand4.o src/dumb_conres.o \
+	src/legeexps.o src/anaresa.o src/curve_resampler.o
 
 .PHONY: usage examples matlab debug
 
@@ -100,15 +102,19 @@ mex:  $(STATICLIB)
 ##  examples
 #
 
-examples: $(OBJS) examples/ext_dir examples/trans 
-	time -p ./examples/ext_dir_solver
-	time -p ./examples/trans_solver
+examples: $(OBJS) examples/ext_dir examples/trans examples/curve 
+	time -p ./examples/int2-dir
+	time -p ./examples/int2-trans
+	time -p ./examples/int2-curve && python plot-curve.py
 
 examples/ext_dir:
-	$(FC) $(FFLAGS) examples/ext_dir_solver.f $(OBJS) -o examples/ext_dir_solver -llapack -lblas
+	$(FC) $(FFLAGS) examples/ext_dir_solver.f $(OBJS) -o examples/int2-dir -lopenblas $(LDFLAGS) 
 
 examples/trans:
-	$(FC) $(FFLAGS) examples/trans_solver.f $(OBJS) -o examples/trans_solver -llapack -lblas
+	$(FC) $(FFLAGS) examples/trans_solver.f $(OBJS) -o examples/int2-trans -lopenblas $(LDFLAGS)
+
+examples/curve:
+	$(FC) $(FFLAGS) examples/curve_resampler_test.f $(OBJS) -o examples/int2-curve 
 
 
 clean: objclean

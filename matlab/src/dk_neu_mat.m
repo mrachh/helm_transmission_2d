@@ -34,7 +34,7 @@ function [xmat] = dk_neu_mat(zpars,norder,h,srcinfo,d0)
      return;
   end        
   dkdiffmat = ddiff0_neu_mat(zpars,norder,h,srcinfo);
-  xmat = dkdiffmat + d0mat;
+  xmat = dkdiffmat - d0mat;
 end
 %  
 %
