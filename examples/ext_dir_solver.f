@@ -34,7 +34,7 @@ c
       targ(2) = 5.2d0
 
       nmax = 8000
-      allocate(srcinfo(5,nmax))
+      allocate(srcinfo(6,nmax))
 
       zk = 1.0d1
       zpars(1) = zk
@@ -75,6 +75,11 @@ c
         srcinfo(5,i) = sqrt((a*sin(thet))**2 +(b*cos(thet))**2)
         srcinfo(3,i) = b*cos(thet)/srcinfo(5,i)
         srcinfo(4,i) = a*sin(thet)/srcinfo(5,i)
+        d2xdt2 = -a*cos(thet)
+        d2ydt2 = -b*sin(thet)
+        dxdt = -a*sin(thet)
+        dydt = b*cos(thet)
+        srcinfo(6,i) = (dxdt*d2ydt2 - dydt*d2xdt2)/srcinfo(5,i)**3
       enddo
 
       call slp(src,targ,dpars,zpars,ipars,uex)

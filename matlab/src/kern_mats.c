@@ -643,8 +643,8 @@ MWF77_RETURN MWF77_trans_mat(size_t*, size_t*, double*, double*, dcomplex*, dcom
 } /* end extern C */
 #endif
 
-/* ---- kern_mats.mw: 32 ----
- * slp_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[1] zk, inout dcomplex[n, n] xmat);
+/* ---- kern_mats.mw: 33 ----
+ * slp_mat(size_t[1] n, size_t[1] norder, double[1] h, double[6, n] srcinfo, dcomplex[1] zk, inout dcomplex[n, n] xmat);
  */
 static const char* stubids1_ = "slp_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
 
@@ -661,7 +661,7 @@ void mexStub1(int nlhs, mxArray* plhs[],
     mwSize      dim6_;   /* 1          */
     mwSize      dim7_;   /* 1          */
     mwSize      dim8_;   /* 1          */
-    mwSize      dim9_;   /* 5          */
+    mwSize      dim9_;   /* 6          */
     mwSize      dim10_;   /* n          */
     mwSize      dim11_;   /* 1          */
     mwSize      dim12_;   /* n          */
@@ -755,8 +755,8 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 62 ----
- * dlp_ext_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[1] zk, inout dcomplex[n, n] xmat);
+/* ---- kern_mats.mw: 64 ----
+ * dlp_ext_mat(size_t[1] n, size_t[1] norder, double[1] h, double[6, n] srcinfo, dcomplex[1] zk, inout dcomplex[n, n] xmat);
  */
 static const char* stubids2_ = "dlp_ext_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
 
@@ -773,7 +773,7 @@ void mexStub2(int nlhs, mxArray* plhs[],
     mwSize      dim6_;   /* 1          */
     mwSize      dim7_;   /* 1          */
     mwSize      dim8_;   /* 1          */
-    mwSize      dim9_;   /* 5          */
+    mwSize      dim9_;   /* 6          */
     mwSize      dim10_;   /* n          */
     mwSize      dim11_;   /* 1          */
     mwSize      dim12_;   /* n          */
@@ -867,8 +867,8 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 96 ----
- * comb_ext_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[3] zpars, inout dcomplex[n, n] xmat);
+/* ---- kern_mats.mw: 99 ----
+ * comb_ext_mat(size_t[1] n, size_t[1] norder, double[1] h, double[6, n] srcinfo, dcomplex[3] zpars, inout dcomplex[n, n] xmat);
  */
 static const char* stubids3_ = "comb_ext_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
 
@@ -885,7 +885,7 @@ void mexStub3(int nlhs, mxArray* plhs[],
     mwSize      dim6_;   /* 1          */
     mwSize      dim7_;   /* 1          */
     mwSize      dim8_;   /* 1          */
-    mwSize      dim9_;   /* 5          */
+    mwSize      dim9_;   /* 6          */
     mwSize      dim10_;   /* n          */
     mwSize      dim11_;   /* 3          */
     mwSize      dim12_;   /* n          */
@@ -979,8 +979,8 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 130 ----
- * sprime_ext_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[1] zk, inout dcomplex[n, n] xmat);
+/* ---- kern_mats.mw: 134 ----
+ * sprime_ext_mat(size_t[1] n, size_t[1] norder, double[1] h, double[6, n] srcinfo, dcomplex[1] zk, inout dcomplex[n, n] xmat);
  */
 static const char* stubids4_ = "sprime_ext_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
 
@@ -997,7 +997,7 @@ void mexStub4(int nlhs, mxArray* plhs[],
     mwSize      dim6_;   /* 1          */
     mwSize      dim7_;   /* 1          */
     mwSize      dim8_;   /* 1          */
-    mwSize      dim9_;   /* 5          */
+    mwSize      dim9_;   /* 6          */
     mwSize      dim10_;   /* n          */
     mwSize      dim11_;   /* 1          */
     mwSize      dim12_;   /* n          */
@@ -1091,8 +1091,8 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 167 ----
- * ddiff_neu_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[2] zpars, inout dcomplex[n, n] xmat);
+/* ---- kern_mats.mw: 172 ----
+ * ddiff_neu_mat(size_t[1] n, size_t[1] norder, double[1] h, double[6, n] srcinfo, dcomplex[2] zpars, inout dcomplex[n, n] xmat);
  */
 static const char* stubids5_ = "ddiff_neu_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
 
@@ -1109,7 +1109,7 @@ void mexStub5(int nlhs, mxArray* plhs[],
     mwSize      dim6_;   /* 1          */
     mwSize      dim7_;   /* 1          */
     mwSize      dim8_;   /* 1          */
-    mwSize      dim9_;   /* 5          */
+    mwSize      dim9_;   /* 6          */
     mwSize      dim10_;   /* n          */
     mwSize      dim11_;   /* 2          */
     mwSize      dim12_;   /* n          */
@@ -1203,8 +1203,8 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 204 ----
- * ddiff0_neu_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[1] zpars, inout dcomplex[n, n] xmat);
+/* ---- kern_mats.mw: 210 ----
+ * ddiff0_neu_mat(size_t[1] n, size_t[1] norder, double[1] h, double[6, n] srcinfo, dcomplex[1] zpars, inout dcomplex[n, n] xmat);
  */
 static const char* stubids6_ = "ddiff0_neu_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], io dcomplex[xx])";
 
@@ -1221,7 +1221,7 @@ void mexStub6(int nlhs, mxArray* plhs[],
     mwSize      dim6_;   /* 1          */
     mwSize      dim7_;   /* 1          */
     mwSize      dim8_;   /* 1          */
-    mwSize      dim9_;   /* 5          */
+    mwSize      dim9_;   /* 6          */
     mwSize      dim10_;   /* n          */
     mwSize      dim11_;   /* 1          */
     mwSize      dim12_;   /* n          */
@@ -1315,8 +1315,8 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 237 ----
- * lap_dlp_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, inout dcomplex[n, n] xmat);
+/* ---- kern_mats.mw: 244 ----
+ * lap_dlp_mat(size_t[1] n, size_t[1] norder, double[1] h, double[6, n] srcinfo, inout dcomplex[n, n] xmat);
  */
 static const char* stubids7_ = "lap_dlp_mat(i size_t[x], i size_t[x], i double[x], i double[xx], io dcomplex[xx])";
 
@@ -1332,7 +1332,7 @@ void mexStub7(int nlhs, mxArray* plhs[],
     mwSize      dim5_;   /* 1          */
     mwSize      dim6_;   /* 1          */
     mwSize      dim7_;   /* 1          */
-    mwSize      dim8_;   /* 5          */
+    mwSize      dim8_;   /* 6          */
     mwSize      dim9_;   /* n          */
     mwSize      dim10_;   /* n          */
     mwSize      dim11_;   /* n          */
@@ -1413,8 +1413,8 @@ mw_err_label:
         mexErrMsgTxt(mw_err_txt_);
 }
 
-/* ---- kern_mats.mw: 283 ----
- * trans_mat(size_t[1] n, size_t[1] norder, double[1] h, double[5, n] srcinfo, dcomplex[2] zks, dcomplex[2] a, dcomplex[2] b, inout dcomplex[nsys, nsys] xmat);
+/* ---- kern_mats.mw: 291 ----
+ * trans_mat(size_t[1] n, size_t[1] norder, double[1] h, double[6, n] srcinfo, dcomplex[2] zks, dcomplex[2] a, dcomplex[2] b, inout dcomplex[nsys, nsys] xmat);
  */
 static const char* stubids8_ = "trans_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], i dcomplex[x], i dcomplex[x], io dcomplex[xx])";
 
@@ -1433,7 +1433,7 @@ void mexStub8(int nlhs, mxArray* plhs[],
     mwSize      dim8_;   /* 1          */
     mwSize      dim9_;   /* 1          */
     mwSize      dim10_;   /* 1          */
-    mwSize      dim11_;   /* 5          */
+    mwSize      dim11_;   /* 6          */
     mwSize      dim12_;   /* n          */
     mwSize      dim13_;   /* 2          */
     mwSize      dim14_;   /* 2          */
@@ -1597,14 +1597,14 @@ void mexFunction(int nlhs, mxArray* plhs[],
     } else if (strcmp(id, "*profile report*") == 0) {
         if (!mexprofrecord_)
             mexPrintf("Profiler inactive\n");
-        mexPrintf("%d calls to kern_mats.mw:32\n", mexprofrecord_[1]);
-        mexPrintf("%d calls to kern_mats.mw:62\n", mexprofrecord_[2]);
-        mexPrintf("%d calls to kern_mats.mw:96\n", mexprofrecord_[3]);
-        mexPrintf("%d calls to kern_mats.mw:130\n", mexprofrecord_[4]);
-        mexPrintf("%d calls to kern_mats.mw:167\n", mexprofrecord_[5]);
-        mexPrintf("%d calls to kern_mats.mw:204\n", mexprofrecord_[6]);
-        mexPrintf("%d calls to kern_mats.mw:237\n", mexprofrecord_[7]);
-        mexPrintf("%d calls to kern_mats.mw:283\n", mexprofrecord_[8]);
+        mexPrintf("%d calls to kern_mats.mw:33\n", mexprofrecord_[1]);
+        mexPrintf("%d calls to kern_mats.mw:64\n", mexprofrecord_[2]);
+        mexPrintf("%d calls to kern_mats.mw:99\n", mexprofrecord_[3]);
+        mexPrintf("%d calls to kern_mats.mw:134\n", mexprofrecord_[4]);
+        mexPrintf("%d calls to kern_mats.mw:172\n", mexprofrecord_[5]);
+        mexPrintf("%d calls to kern_mats.mw:210\n", mexprofrecord_[6]);
+        mexPrintf("%d calls to kern_mats.mw:244\n", mexprofrecord_[7]);
+        mexPrintf("%d calls to kern_mats.mw:291\n", mexprofrecord_[8]);
     } else if (strcmp(id, "*profile log*") == 0) {
         FILE* logfp;
         if (nrhs != 2 || mxGetString(prhs[1], id, sizeof(id)) != 0)
@@ -1614,14 +1614,14 @@ void mexFunction(int nlhs, mxArray* plhs[],
             mexErrMsgTxt("Cannot open log for output");
         if (!mexprofrecord_)
             fprintf(logfp, "Profiler inactive\n");
-        fprintf(logfp, "%d calls to kern_mats.mw:32\n", mexprofrecord_[1]);
-        fprintf(logfp, "%d calls to kern_mats.mw:62\n", mexprofrecord_[2]);
-        fprintf(logfp, "%d calls to kern_mats.mw:96\n", mexprofrecord_[3]);
-        fprintf(logfp, "%d calls to kern_mats.mw:130\n", mexprofrecord_[4]);
-        fprintf(logfp, "%d calls to kern_mats.mw:167\n", mexprofrecord_[5]);
-        fprintf(logfp, "%d calls to kern_mats.mw:204\n", mexprofrecord_[6]);
-        fprintf(logfp, "%d calls to kern_mats.mw:237\n", mexprofrecord_[7]);
-        fprintf(logfp, "%d calls to kern_mats.mw:283\n", mexprofrecord_[8]);
+        fprintf(logfp, "%d calls to kern_mats.mw:33\n", mexprofrecord_[1]);
+        fprintf(logfp, "%d calls to kern_mats.mw:64\n", mexprofrecord_[2]);
+        fprintf(logfp, "%d calls to kern_mats.mw:99\n", mexprofrecord_[3]);
+        fprintf(logfp, "%d calls to kern_mats.mw:134\n", mexprofrecord_[4]);
+        fprintf(logfp, "%d calls to kern_mats.mw:172\n", mexprofrecord_[5]);
+        fprintf(logfp, "%d calls to kern_mats.mw:210\n", mexprofrecord_[6]);
+        fprintf(logfp, "%d calls to kern_mats.mw:244\n", mexprofrecord_[7]);
+        fprintf(logfp, "%d calls to kern_mats.mw:291\n", mexprofrecord_[8]);
         fclose(logfp);
     } else
         mexErrMsgTxt("Unknown identifier");

@@ -16,16 +16,16 @@ function [binfo] = eval_curve(ts,wsave)
 %      precomputed saved array from resample_curve
 %
 %  Output arguments:
-%    binfo(5,n) -
-%      x,y,rnx,rny,dst at requested points
+%    binfo(6,n) -
+%      x,y,rnx,rny,dst, curvature at requested points
 %
   tsuse = ts(:);
   n = length(tsuse);
-  binfo = zeros(5,n);
+  binfo = zeros(6,n);
   lsave = length(wsave);
 
   mex_id_ = 'eval_curve_multi(i size_t[x], i double[x], i size_t[x], i double[x], io double[xx])';
-[binfo] = curve_resampler(mex_id_, n, tsuse, lsave, wsave, binfo, 1, n, 1, lsave, 5, n);
+[binfo] = curve_resampler(mex_id_, n, tsuse, lsave, wsave, binfo, 1, n, 1, lsave, 6, n);
 
 
 end

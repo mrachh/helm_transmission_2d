@@ -26,7 +26,7 @@
 %      is 4.
 %  
 %  Output arguemnts:
-%    srcinfo(5,nout) - 
+%    srcinfo(6,nout) - 
 %      resampled curve
 %    h - 
 %      spacing between points in parameter space
@@ -75,14 +75,14 @@
     fprintf('try running the routine by setting nmax > 4\n');
   end
 
-  srcinfo = zeros(5,nout);
+  srcinfo = zeros(6,nout);
   wsave = zeros(lsave,1);
   ts = zeros(n+1,1);
   nn = n+1;
   h = 0.0;
   curvelen = 0.0;
   ier = 0;
-  # FORTRAN simple_curve_resampler_guru(int[1] n, double[2,n] xy, int[1] nb, int[1] nlarge, int[1] lsave, int[1] lused, int[1] nout, inout double[5,nout] srcinfo, inout double[1] h, inout double[1] curvelen, inout double[lsave] wsave, inout double[nn] ts, inout int[1] ier);
+  # FORTRAN simple_curve_resampler_guru(int[1] n, double[2,n] xy, int[1] nb, int[1] nlarge, int[1] lsave, int[1] lused, int[1] nout, inout double[6,nout] srcinfo, inout double[1] h, inout double[1] curvelen, inout double[lsave] wsave, inout double[nn] ts, inout int[1] ier);
   varargout{1} = srcinfo;
   varargout{2} = h;
 
@@ -118,15 +118,15 @@ end
 %      precomputed saved array from resample_curve
 %
 %  Output arguments:
-%    binfo(5,n) -
-%      x,y,rnx,rny,dst at requested points
+%    binfo(6,n) -
+%      x,y,rnx,rny,dst, curvature at requested points
 %
   tsuse = ts(:);
   n = length(tsuse);
-  binfo = zeros(5,n);
+  binfo = zeros(6,n);
   lsave = length(wsave);
 
-  #FORTRAN eval_curve_multi(int[1] n, double[n] tsuse, int[1] lsave, double[lsave] wsave, inout double[5,n] binfo);
+  #FORTRAN eval_curve_multi(int[1] n, double[n] tsuse, int[1] lsave, double[lsave] wsave, inout double[6,n] binfo);
 
 
 end

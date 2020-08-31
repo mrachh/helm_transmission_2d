@@ -18,6 +18,7 @@ function [xmat] = rpcomb_dir_ext_mat(zpars,norder,h,srcinfo)
 %       srcinfo(1:2,:) - locations
 %       srcinfo(3:4,:) - normals
 %       srcinfo(5,:) - dsdt
+%       srcinfo(6,:) - curvature
 %
 %    h - step size in parameter space
 %
@@ -26,7 +27,7 @@ function [xmat] = rpcomb_dir_ext_mat(zpars,norder,h,srcinfo)
 %       combined field matrix
 
   [m,~] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (5,n)');
   zk = zpars(1);
   smat = slp_mat(zk,norder,h,srcinfo);
   zk2 = 1j*abs(zk);

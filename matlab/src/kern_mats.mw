@@ -15,10 +15,11 @@
 %  Input: 
 %    zk - Helmholtz parameter
 %    norder - Alpert quadrature rule order
-%    srcinfo(5,n) - source info
+%    srcinfo(6,n) - source info
 %       srcinfo(1:2,:) - locations
 %       srcinfo(3:4,:) - normals
 %       srcinfo(5,:) - dsdt
+%       srcinfo(6,:) - curvature
 %
 %    h - step size in parameter space
 %
@@ -27,9 +28,9 @@
 %       slp matrix
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (6,n)');
   xmat = complex(zeros(n),0);
-  #FORTRAN slp_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, dcomplex[1] zk, inout dcomplex[n,n] xmat);
+  #FORTRAN slp_mat(int[1] n,int[1] norder,double[1] h, double[6,n] srcinfo, dcomplex[1] zk, inout dcomplex[n,n] xmat);
 end
 %
 %
@@ -45,10 +46,11 @@ end
 %  Input: 
 %    zk - Helmholtz parameter
 %    norder - Alpert quadrature rule order
-%    srcinfo(5,n) - source info
+%    srcinfo(6,n) - source info
 %       srcinfo(1:2,:) - locations
 %       srcinfo(3:4,:) - normals
 %       srcinfo(5,:) - dsdt
+%       srcinfo(6,:) - curvature
 %
 %    h - step size in parameter space
 %
@@ -57,9 +59,9 @@ end
 %       dlp matrix
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(n),0);
-  #FORTRAN dlp_ext_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, dcomplex[1] zk, inout dcomplex[n,n] xmat);
+  #FORTRAN dlp_ext_mat(int[1] n,int[1] norder,double[1] h, double[6,n] srcinfo, dcomplex[1] zk, inout dcomplex[n,n] xmat);
 end
 %  
 %
@@ -79,10 +81,11 @@ end
 %      zpars(2) - single layer strength
 %      zpars(3) - double layer strength
 %    norder - Alpert quadrature rule order
-%    srcinfo(5,n) - source info
+%    srcinfo(6,n) - source info
 %       srcinfo(1:2,:) - locations
 %       srcinfo(3:4,:) - normals
 %       srcinfo(5,:) - dsdt
+%       srcinfo(6,:) - curvature
 %
 %    h - step size in parameter space
 %
@@ -91,9 +94,9 @@ end
 %       combined field matrix
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(n),0);
-  #FORTRAN comb_ext_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, dcomplex[3] zpars, inout dcomplex[n,n] xmat);
+  #FORTRAN comb_ext_mat(int[1] n,int[1] norder,double[1] h, double[6,n] srcinfo, dcomplex[3] zpars, inout dcomplex[n,n] xmat);
 end
 %  
 %
@@ -113,10 +116,11 @@ end
 %  Input: 
 %    zk - Helmholtz paramter
 %    norder - Alpert quadrature rule order
-%    srcinfo(5,n) - source info
+%    srcinfo(6,n) - source info
 %       srcinfo(1:2,:) - locations
 %       srcinfo(3:4,:) - normals
 %       srcinfo(5,:) - dsdt
+%       srcinfo(6,:) - curvature
 %
 %    h - step size in parameter space
 %
@@ -125,9 +129,9 @@ end
 %       combined field matrix
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(n),0);
-  #FORTRAN sprime_ext_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, dcomplex[1] zk, inout dcomplex[n,n] xmat);
+  #FORTRAN sprime_ext_mat(int[1] n,int[1] norder,double[1] h, double[6,n] srcinfo, dcomplex[1] zk, inout dcomplex[n,n] xmat);
 end
 %  
 %
@@ -150,10 +154,11 @@ end
 %      zpars(1) - Helmholtz paramter (k1)
 %      zpars(2) - Helmholtz paramter (k2)
 %    norder - Alpert quadrature rule order
-%    srcinfo(5,n) - source info
+%    srcinfo(6,n) - source info
 %       srcinfo(1:2,:) - locations
 %       srcinfo(3:4,:) - normals
 %       srcinfo(5,:) - dsdt
+%       srcinfo(6,:) - curvature
 %
 %    h - step size in parameter space
 %
@@ -162,9 +167,9 @@ end
 %       combined field matrix
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(n),0);
-  #FORTRAN ddiff_neu_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, dcomplex[2] zpars, inout dcomplex[n,n] xmat);
+  #FORTRAN ddiff_neu_mat(int[1] n,int[1] norder,double[1] h, double[6,n] srcinfo, dcomplex[2] zpars, inout dcomplex[n,n] xmat);
 end
 %  
 %
@@ -186,10 +191,11 @@ end
 %    zpars(1) - 
 %      zpars(1) - Helmholtz paramter (k1)
 %    norder - Alpert quadrature rule order
-%    srcinfo(5,n) - source info
+%    srcinfo(6,n) - source info
 %       srcinfo(1:2,:) - locations
 %       srcinfo(3:4,:) - normals
 %       srcinfo(5,:) - dsdt
+%       srcinfo(6,:) - curvature
 %
 %    h - step size in parameter space
 %
@@ -199,9 +205,9 @@ end
 %       
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(n),0);
-  #FORTRAN ddiff0_neu_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, dcomplex[1] zpars, inout dcomplex[n,n] xmat);
+  #FORTRAN ddiff0_neu_mat(int[1] n,int[1] norder,double[1] h, double[6,n] srcinfo, dcomplex[1] zpars, inout dcomplex[n,n] xmat);
 end
 %  
 %
@@ -219,10 +225,11 @@ end
 %
 %  Input: 
 %    norder - Alpert quadrature rule order
-%    srcinfo(5,n) - source info
+%    srcinfo(6,n) - source info
 %       srcinfo(1:2,:) - locations
 %       srcinfo(3:4,:) - normals
 %       srcinfo(5,:) - dsdt
+%       srcinfo(6,:) - curvature
 %
 %    h - step size in parameter space
 %
@@ -232,9 +239,9 @@ end
 %       
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(n),0);
-  #FORTRAN lap_dlp_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, inout dcomplex[n,n] xmat);
+  #FORTRAN lap_dlp_mat(int[1] n,int[1] norder,double[1] h, double[6,n] srcinfo, inout dcomplex[n,n] xmat);
 end
 %  
 %
@@ -265,10 +272,11 @@ end
 %    b(2) - complex
 %      scaling for jump in dudn
 %    norder - Alpert quadrature rule order
-%    srcinfo(5,n) - source info
+%    srcinfo(6,n) - source info
 %       srcinfo(1:2,:) - locations
 %       srcinfo(3:4,:) - normals
 %       srcinfo(5,:) - dsdt
+%       srcinfo(6,:) - curvature
 %
 %    h - step size in parameter space
 %
@@ -277,9 +285,9 @@ end
 %       transmission matrix
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(2*n),0);
   nsys = 2*n;
-  #FORTRAN trans_mat(int[1] n,int[1] norder,double[1] h, double[5,n] srcinfo, dcomplex[2] zks, dcomplex[2] a, dcomplex[2] b, inout dcomplex[nsys,nsys] xmat);
+  #FORTRAN trans_mat(int[1] n,int[1] norder,double[1] h, double[6,n] srcinfo, dcomplex[2] zks, dcomplex[2] a, dcomplex[2] b, inout dcomplex[nsys,nsys] xmat);
 end
   

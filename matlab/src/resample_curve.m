@@ -20,7 +20,7 @@ function [varargout] = resample_curve(xy,nb,eps,nmax)
 %      is 4.
 %  
 %  Output arguemnts:
-%    srcinfo(5,nout) - 
+%    srcinfo(6,nout) - 
 %      resampled curve
 %    h - 
 %      spacing between points in parameter space
@@ -70,7 +70,7 @@ function [varargout] = resample_curve(xy,nb,eps,nmax)
     fprintf('try running the routine by setting nmax > 4\n');
   end
 
-  srcinfo = zeros(5,nout);
+  srcinfo = zeros(6,nout);
   wsave = zeros(lsave,1);
   ts = zeros(n+1,1);
   nn = n+1;
@@ -78,7 +78,7 @@ function [varargout] = resample_curve(xy,nb,eps,nmax)
   curvelen = 0.0;
   ier = 0;
   mex_id_ = 'simple_curve_resampler_guru(i size_t[x], i double[xx], i size_t[x], i size_t[x], i size_t[x], i size_t[x], i size_t[x], io double[xx], io double[x], io double[x], io double[x], io double[x], io size_t[x])';
-[srcinfo, h, curvelen, wsave, ts, ier] = curve_resampler(mex_id_, n, xy, nb, nlarge, lsave, lused, nout, srcinfo, h, curvelen, wsave, ts, ier, 1, 2, n, 1, 1, 1, 1, 1, 5, nout, 1, 1, lsave, nn, 1);
+[srcinfo, h, curvelen, wsave, ts, ier] = curve_resampler(mex_id_, n, xy, nb, nlarge, lsave, lused, nout, srcinfo, h, curvelen, wsave, ts, ier, 1, 2, n, 1, 1, 1, 1, 1, 6, nout, 1, 1, lsave, nn, 1);
   varargout{1} = srcinfo;
   varargout{2} = h;
 

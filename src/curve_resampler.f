@@ -47,7 +47,7 @@
         do i=1,n
           xver(i) = 0
           yver(i) = 0
-          call eval_curve(ier,ts(i),work,xver(i),yver(i),dxt,dyt)
+          call eval_curve(ier,ts(i),work,xver(i),yver(i),dxt,dyt,curv)
           erra = erra + (xver(i)-xy(1,i))**2
           ra = ra + xy(1,i)**2
           erra = erra + (yver(i)-xy(2,i))**2
@@ -77,7 +77,7 @@ c
      1   nlarge,lsave,lused,nout,srcinfoout,hout,curvelen,wsave,ts,ier)
       implicit real *8 (a-h,o-z)
       integer n,nout,lsave,lused
-      real *8 xy(2,n),srcinfoout(5,nout),curvelen
+      real *8 xy(2,n),srcinfoout(6,nout),curvelen
       real *8 ts(n+1)
       real *8 wsave(lsave)
       real *8, allocatable :: x0(:),y0(:),work(:)
@@ -96,18 +96,19 @@ c
       nbl = 0
       ier = 0
 
+
       
       call rsblcurve(ier,x0,y0,n,nb,nlarge,curvelen,nbl,
      1   derr,ts,work,lenw,lsave0,lused)
 
       
       wsave(1:lsave) = work(1:lsave)
-      
+
       hout = curvelen/(nout+0.0d0)
       do i=1,nout
         t = (i-1)*hout
         call eval_curve(ier2,t,wsave,srcinfoout(1,i),srcinfoout(2,i),
-     1    dxt,dyt)
+     1    dxt,dyt,srcinfoout(6,i))
         srcinfoout(5,i) = sqrt(dxt**2 + dyt**2)
         srcinfoout(3,i) = dyt/srcinfoout(5,i)
         srcinfoout(4,i) = -dxt/srcinfoout(5,i)
@@ -123,10 +124,11 @@ c
       subroutine eval_curve_multi(n,ts,lsave,wsave,binfo)
       implicit real *8 (a-h,o-z)
       integer n,lsave
-      real *8 ts(n),wsave(lsave),binfo(5,n)
+      real *8 ts(n),wsave(lsave),binfo(6,n)
 
       do i=1,n
-        call eval_curve(ier,ts(i),wsave,binfo(1,i),binfo(2,i),dxt,dyt)
+        call eval_curve(ier,ts(i),wsave,binfo(1,i),binfo(2,i),dxt,dyt,
+     1   binfo(6,i))
         binfo(5,i) = sqrt(dxt**2 + dyt**2)
         binfo(3,i) = dyt/binfo(5,i)
         binfo(4,i) = -dxt/binfo(5,i)
@@ -422,6 +424,7 @@ c
         real *8 ts(nlarge+1),zs(2,nlarge+1),der1(2,nlarge+1),w(1),w3(1),
      1       xgs(1),whts(1),wright(1),wvals(1),tn(n0),tsout(n0),
      2       ww(1),wsave(1)
+        real *8 curv
         external funcurv_fast        
 c
 c       subroutine to obtain arc-length discretization of gaussian
@@ -482,7 +485,7 @@ c
 c
         do 1100 i=1,nlarge+1
         call funcurv_fast(ts(i),w,w3,zs(1,i),zs(2,i),
-     1       der1(1,i),der1(2,i))
+     1       der1(1,i),der1(2,i),curv)
  1100   continue
 c
 c       to account for change of variable to arc-length,
@@ -1050,7 +1053,7 @@ c
         dd=0
         do 1400 i=1,n0
         tt=tn(i)*curvelen
-        call funcurv_fast(tt,w,w3,xt,yt,dxt,dyt)
+        call funcurv_fast(tt,w,w3,xt,yt,dxt,dyt,curv)
         dx=xs(i)-xt
         dy=ys(i)-yt
         dd=dd+sqrt(dx*dx+dy*dy)
@@ -1066,7 +1069,7 @@ c
 c
 c
 c
-        subroutine eval_curve(ier,t,w,x,y,dxdt,dydt)
+        subroutine eval_curve(ier,t,w,x,y,dxdt,dydt,curv)
 c
         implicit real *8 (a-h,o-z)
         real *8 w(1),w2(1)
@@ -1087,7 +1090,7 @@ c
 c
         call anaptbl(ier,t,nlarge,h,w(its),funcurv_fast,w(iw),w(iw2),
      1       eps,m,w(ixgs),w(iwhts),w(iwr),w(iwv),nints,tout,
-     2       x,y,dxdt,dydt)
+     2       x,y,dxdt,dydt,curv)
 c
         return
 c
@@ -1097,10 +1100,10 @@ c
 c
 c
 c
-        subroutine funcurv_fast(t,w,w2,x,y,dxdt,dydt)
+        subroutine funcurv_fast(t,w,w2,x,y,dxdt,dydt,curv)
 c
         implicit real *8 (a-h,o-z)
-        real *8 w(1),w2(1),tang(10),curv(5),z(10)
+        real *8 w(1),w2(1),tang(10),curv,z(10),curv0
 c
         n0=w2(1)
         nlarge=w2(2)
@@ -1116,12 +1119,16 @@ c
 c
 c       evaluate the curve
 c
+        curv = 0
         call rsrespnt(t2,z,nlarge,tang,curv,w)
+        call prin2('curv=*',curv,1)
 c
         x=z(1)
         y=z(2)
         dxdt=tang(1)
         dydt=tang(2)
+
+        call prin2('tang=*',tang,2)
 c
 c       normalize the tangents
 c
@@ -1132,7 +1139,11 @@ c
 c
 c       evaluate the guassian perturbations
 c
-        call rsrespnt(t2,z,nlarge,tang,curv,w2(iw))
+        curv0 = 0
+        call rsrespnt(t2,z,nlarge,tang,curv0,w2(iw))
+        call prin2('curv0=*',curv0,1)
+        call prin2('tang=*',tang,2)
+        curv = curv + curv0
 c
         x=x+z(1)
         y=y+z(2)
@@ -3423,7 +3434,7 @@ cccc         call prinf('in anarsbl, k=*',k,1)
 c 
 c       determine the dl/dt at the point t(k)
 c 
-        call funcurve(t(k),par1,par2,x,y,dxdt,dydt)
+        call funcurve(t(k),par1,par2,x,y,dxdt,dydt,curv)
 c 
 c       get the initial approximation for the next point
 c 
@@ -3505,7 +3516,7 @@ c
 c       determine the dl/dt at that point and make a
 c       newton step
 c 
-        call funcurve(t(k)+dt,par1,par2,x,y,dxdt,dydt)
+        call funcurve(t(k)+dt,par1,par2,x,y,dxdt,dydt,curv)
         dldt=dsqrt(dxdt**2+dydt**2)
 c 
         derr=htrue-h
@@ -3575,9 +3586,8 @@ c
 c 
          subroutine anaptbl(ier,x,n,h,ts,funcurve,par1,par2,eps,
      1       mm,xgs,whts,wright,wvals,nints,tout,
-     2       xout,yout,dxdtout,dydtout)
+     2       xout,yout,dxdtout,dydtout,curvout)
          implicit real *8 (a-h,o-z)
-         save
          real *8 ts(1),xgs(1),whts(1),wright(1),wvals(1)
          real *8 tz(10),xz(10),cz(10)
          external funcurve
@@ -3607,7 +3617,7 @@ c  funcurve - the subroutine providing a parametrization
 c        of the curve. the calling sequence of funcurve
 c        must be
 c 
-c                  funcurve(t,par1,par2,x,y,dxdt,dydt),
+c                  funcurve(t,par1,par2,x,y,dxdt,dydt,curv),
 c 
 c        with:
 c 
@@ -3622,6 +3632,7 @@ c           of the parameter
 c       dydt - the derivative with respect to t of the  y-coordinate
 c           of the point on the curve corresponding to the values t
 c           of the parameter
+c       curv - the curvature
 c  eps - the precision to which the point is to be found. Generally, it
 c       is a good idea to make this parameter the same as in the
 c       preceding call to anarsbl
@@ -3741,7 +3752,7 @@ c
 c       determine the dl/dt at that point and make a
 c       newton step
 c 
-        call funcurve(tk,par1,par2,xk,yk,dxdt,dydt)
+        call funcurve(tk,par1,par2,xk,yk,dxdt,dydt,curv)
         dldt=dsqrt(dxdt**2+dydt**2)
 c 
         tkold=tk
@@ -3762,7 +3773,7 @@ c
  2000 continue
 c
         tout=tk
-        call funcurve(tout,par1,par2,xout,yout,dxdtout,dydtout)
+        call funcurve(tout,par1,par2,xout,yout,dxdtout,dydtout,curvout)
 c 
         d=sqrt(dxdtout**2+dydtout**2)
         dxdtout=dxdtout/d
@@ -3794,7 +3805,7 @@ c       be evaluated
 c  fun - the user-supplied function describing the curve.to be integrated.
 c        the calling sequence of fun must be
 c 
-c        fun(t,x,y,dxdt,dydt)
+c        fun(t,x,y,dxdt,dydt,curv)
 c 
 c  par1, par2 - dummies
 c  m - the order of the quadrature to me used on each subinterval
@@ -3957,7 +3968,7 @@ c
 c
         tt=u*t(i)+v
 c
-        call fun(tt,par1,par2,x,y,dxdt,dydt)
+        call fun(tt,par1,par2,x,y,dxdt,dydt,curv)
 c
         rint=rint+w(i)*dsqrt(dxdt**2+dydt**2)
 c

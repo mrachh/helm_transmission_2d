@@ -24,7 +24,7 @@ function [xmat] = dk_neu_mat(zpars,norder,h,srcinfo,d0)
 %       
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (6,n)');
   if (nargin == 4)
     d0mat = d0_neu_mat(norder,h,srcinfo);
   elseif (nargin == 5)

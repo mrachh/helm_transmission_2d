@@ -22,7 +22,7 @@ function [xmat] = d0_neu_mat(norder,h,srcinfo)
 %       
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (6,n)');
   D = specdiffmat(n,srcinfo);
   xmat2 = lap_dlp_mat(norder,h,srcinfo);
   xmat2 = xmat2 - 0.5*eye(n);

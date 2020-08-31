@@ -796,7 +796,7 @@ mw_err_label:
 }
 
 /* ---- curve_resampler.mw: 85 ----
- * simple_curve_resampler_guru(size_t[1] n, double[2, n] xy, size_t[1] nb, size_t[1] nlarge, size_t[1] lsave, size_t[1] lused, size_t[1] nout, inout double[5, nout] srcinfo, inout double[1] h, inout double[1] curvelen, inout double[lsave] wsave, inout double[nn] ts, inout size_t[1] ier);
+ * simple_curve_resampler_guru(size_t[1] n, double[2, n] xy, size_t[1] nb, size_t[1] nlarge, size_t[1] lsave, size_t[1] lused, size_t[1] nout, inout double[6, nout] srcinfo, inout double[1] h, inout double[1] curvelen, inout double[lsave] wsave, inout double[nn] ts, inout size_t[1] ier);
  */
 static const char* stubids2_ = "simple_curve_resampler_guru(i size_t[x], i double[xx], i size_t[x], i size_t[x], i size_t[x], i size_t[x], i size_t[x], io double[xx], io double[x], io double[x], io double[x], io double[x], io size_t[x])";
 
@@ -825,7 +825,7 @@ void mexStub2(int nlhs, mxArray* plhs[],
     mwSize      dim18_;   /* 1          */
     mwSize      dim19_;   /* 1          */
     mwSize      dim20_;   /* 1          */
-    mwSize      dim21_;   /* 5          */
+    mwSize      dim21_;   /* 6          */
     mwSize      dim22_;   /* nout       */
     mwSize      dim23_;   /* 1          */
     mwSize      dim24_;   /* 1          */
@@ -1017,7 +1017,7 @@ mw_err_label:
 }
 
 /* ---- curve_resampler.mw: 129 ----
- * eval_curve_multi(size_t[1] n, double[n] tsuse, size_t[1] lsave, double[lsave] wsave, inout double[5, n] binfo);
+ * eval_curve_multi(size_t[1] n, double[n] tsuse, size_t[1] lsave, double[lsave] wsave, inout double[6, n] binfo);
  */
 static const char* stubids3_ = "eval_curve_multi(i size_t[x], i double[x], i size_t[x], i double[x], io double[xx])";
 
@@ -1034,7 +1034,7 @@ void mexStub3(int nlhs, mxArray* plhs[],
     mwSize      dim6_;   /* n          */
     mwSize      dim7_;   /* 1          */
     mwSize      dim8_;   /* lsave      */
-    mwSize      dim9_;   /* 5          */
+    mwSize      dim9_;   /* 6          */
     mwSize      dim10_;   /* n          */
 
     dim5_ = (mwSize) mxWrapGetScalar(prhs[5], &mw_err_txt_);

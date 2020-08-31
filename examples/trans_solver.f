@@ -75,7 +75,7 @@ c
       b(2) = 3.0d0
  
       nmax = 8000
-      allocate(srcinfo(5,nmax))
+      allocate(srcinfo(6,nmax))
 
       zkm = max(abs(zk(1)),abs(zk(2)))
       norder = 16
@@ -115,6 +115,11 @@ c
         srcinfo(5,i) = sqrt((a0*sin(thet))**2 +(b0*cos(thet))**2)
         srcinfo(3,i) = b0*cos(thet)/srcinfo(5,i)
         srcinfo(4,i) = a0*sin(thet)/srcinfo(5,i)
+        d2xdt2 = -a0*cos(thet)
+        d2ydt2 = -b0*sin(thet)
+        dxdt = -a0*sin(thet)
+        dydt = b0*cos(thet)
+        srcinfo(6,i) = (dxdt*d2ydt2 - dydt*d2xdt2)/srcinfo(5,i)**3
       enddo
       nsys = 2*n
 

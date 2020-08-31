@@ -21,7 +21,7 @@ c
         subroutine formmatbac(amat,norder,ns,srcinfo,h,gfun,dpars,
      1      zpars,ipars)
         implicit real *8 (a-h,o-z)
-        real *8 srcinfo(5,ns),dpars(*)
+        real *8 srcinfo(6,ns),dpars(*)
         integer ipars(*)
         complex *16 zpars(*)
         real *8 tpts(100),txtra(100),coefs(100),srctmp(5),srcpts(5,100)
@@ -44,6 +44,7 @@ c       norder - the order of alpert quadrature to use, 0, 2, 4, 8, 16
 c       srcinfo(5,ns) 
 c           srcinfo(1:2,*) = xs,ys, srcinfo(3:4,*) = rnx,rny,
 c           srcinfo(5,*) = dsdt
+c           srcinfo(6,:) - curvature
 c       xs,ys - the x,y coordinates of points on the curve
 c       rnx,rny - the unit normal derivative at the points xs,ys
 c       dsdt - derivative of parameterization
@@ -381,7 +382,7 @@ c
         subroutine formmatbac_corr(acorr,norder,ns,srcinfo,h,gfun,dpars,
      1      zpars,ipars)
         implicit real *8 (a-h,o-z)
-        real *8 srcinfo(5,ns),dpars(*)
+        real *8 srcinfo(6,ns),dpars(*)
         integer ipars(*)
         complex *16 zpars(*)
         real *8 tpts(100),txtra(100),coefs(100),srctmp(5),srcpts(5,100)
@@ -401,9 +402,10 @@ c       gfun to a vector using alpert quadrature
 c
 c     input:
 c       norder - the order of alpert quadrature to use, 0, 2, 4, 8, 16
-c       srcinfo(5,ns) 
+c       srcinfo(6,ns) 
 c           srcinfo(1:2,*) = xs,ys, srcinfo(3:4,*) = rnx,rny,
 c           srcinfo(5,*) = dsdt
+c           srcinfo(6,:) - curvature
 c       xs,ys - the x,y coordinates of points on the curve
 c       rnx,rny - the unit normal derivative at the points xs,ys
 c       dsdt - derivative of parameterization

@@ -26,6 +26,7 @@ c           boundary discretization info
 c           srcinfo(1:2,:) - xy locations
 c           srcinfo(3:4,:) - normal info
 c           srcinfo(5,:) - dsdt
+c           srcinfo(6,:) - curvature
 c         zk - complex *16
 c           Helmholtz parameter
 c 
@@ -35,7 +36,7 @@ c            helmholtz single layer matrix
 
       implicit none
       integer n,norder
-      real *8 srcinfo(5,n),dpars,h
+      real *8 srcinfo(6,n),dpars,h
       integer ipars
       complex *16 zk,xmat(n,n)
       external slp
@@ -65,6 +66,7 @@ c           boundary discretization info
 c           srcinfo(1:2,:) - xy locations
 c           srcinfo(3:4,:) - normal info
 c           srcinfo(5,:) - dsdt
+c           srcinfo(6,:) - curvature
 c         zk - complex *16
 c           Helmholtz parameter
 c 
@@ -74,7 +76,7 @@ c            exterior limit of Helmholtz double layer matrix
 
       implicit none
       integer n,i,norder
-      real *8 srcinfo(5,n),dpars,h
+      real *8 srcinfo(6,n),dpars,h
       integer ipars
       complex *16 zk,xmat(n,n)
       external dlp
@@ -109,6 +111,7 @@ c           boundary discretization info
 c           srcinfo(1:2,:) - xy locations
 c           srcinfo(3:4,:) - normal info
 c           srcinfo(5,:) - dsdt
+c           srcinfo(6,:) - curvature
 c         zpars(3) - complex *16
 c           zpars(1) = zk = Helmholtz parameter
 c           zpars(2) - single layer strength
@@ -120,7 +123,7 @@ c            helmholtz combined field exterior limit
 
       implicit none
       integer n,norder,i
-      real *8 srcinfo(5,n),dpars,h
+      real *8 srcinfo(6,n),dpars,h
       integer ipars
       complex *16 zpars(3),xmat(n,n)
       external comb
@@ -157,6 +160,7 @@ c           boundary discretization info
 c           srcinfo(1:2,:) - xy locations
 c           srcinfo(3:4,:) - normal info
 c           srcinfo(5,:) - dsdt
+c           srcinfo(6,:) - curvature
 c         zpars(1) - complex *16
 c           zpars(1) = zk = Helmholtz parameter
 c 
@@ -166,7 +170,7 @@ c            helmholtz combined field exterior limit
 
       implicit none
       integer n,norder,i
-      real *8 srcinfo(5,n),dpars,h
+      real *8 srcinfo(6,n),dpars,h
       integer ipars
       complex *16 zpars,xmat(n,n)
       external sprime
@@ -210,6 +214,7 @@ c           boundary discretization info
 c           srcinfo(1:2,:) - xy locations
 c           srcinfo(3:4,:) - normal info
 c           srcinfo(5,:) - dsdt
+c           srcinfo(6,:) - curvature
 c         zpars(2) - complex *16
 c           zpars(1) = k1 = Helmholtz parameter
 c           zpars(2) = k2 = Helmholtz parameter 2 
@@ -220,7 +225,7 @@ c            helmholtz combined field exterior limit
 
       implicit none
       integer n,norder,i
-      real *8 srcinfo(5,n),dpars,h
+      real *8 srcinfo(6,n),dpars,h
       integer ipars
       complex *16 zpars(2),xmat(n,n)
       complex *16 zpars_tmp(6)
@@ -263,6 +268,7 @@ c           boundary discretization info
 c           srcinfo(1:2,:) - xy locations
 c           srcinfo(3:4,:) - normal info
 c           srcinfo(5,:) - dsdt
+c           srcinfo(6,:) - curvature
 c         zk - complex *16
 c           k = Helmholtz parameter
 c 
@@ -272,7 +278,7 @@ c            helmholtz combined field exterior limit
 
       implicit none
       integer n,norder,i
-      real *8 srcinfo(5,n),dpars,h
+      real *8 srcinfo(6,n),dpars,h
       integer ipars
       complex *16 zk,xmat(n,n)
       external dprime0_diff 
@@ -305,6 +311,7 @@ c           boundary discretization info
 c           srcinfo(1:2,:) - xy locations
 c           srcinfo(3:4,:) - normal info
 c           srcinfo(5,:) - dsdt
+c           srcinfo(6,:) - curvature
 c 
 c        output:
 c          xmat(n,n) - complex *16
@@ -312,7 +319,7 @@ c            Laplace double layer discretization
 
       implicit none
       integer n,norder,i
-      real *8 srcinfo(5,n),dpars,h
+      real *8 srcinfo(6,n),dpars,h
       integer ipars
       complex *16 xmat(n,n),zpars
       external lap_dlp 
@@ -367,6 +374,7 @@ c           boundary discretization info
 c           srcinfo(1:2,:) - xy locations
 c           srcinfo(3:4,:) - normal info
 c           srcinfo(5,:) - dsdt
+c           srcinfo(6,:) - curvature
 c         zks(2) - complex *16
 c           zks(1) = interior Helmholtz parameter
 c           zks(2) - exterior Helmholtz parameter
@@ -382,7 +390,7 @@ c
 c
       implicit none
       integer n,i,j,nsys,norder
-      real *8 srcinfo(5,n),dpars,h
+      real *8 srcinfo(6,n),dpars,h
       integer ipars
       complex *16 zpars(6),zks(2),a(2),b(2),xmat(2*n,2*n),q
       complex *16, allocatable :: xmattmp(:,:)

@@ -43,7 +43,7 @@ MWRAP=../../../mwrap/mwrap
 OBJS = src/hank103.o src/prini.o src/helm_kernels.o  \
 	src/formsysmatbac.o src/kern_mats.o src/lap_kernels.o \
 	src/durdec.o src/corrand4.o src/dumb_conres.o \
-	src/legeexps.o src/anaresa.o src/curve_resampler.o
+	src/legeexps.o src/curve_resampler.o
 
 .PHONY: usage examples matlab debug
 

@@ -26,7 +26,7 @@ function [xmat] = rpcomb_neu_ext_mat(zpars,norder,h,srcinfo)
 %       combined field matrix
 
   [m,n] = size(srcinfo);
-  assert(m==5,'srcinfo must be of shape (5,n)');
+  assert(m==6,'srcinfo must be of shape (6,n)');
   zk = zpars(1);
   alpha = zpars(2);
   spmat = sprime_ext_mat(zk,norder,h,srcinfo);
