@@ -29,7 +29,7 @@
       epscheck = max(eps,1.0d-12)
  
       do ii=1,nmax
-        nlarge = 16*2**(ii)*n
+        nlarge = 4*2**(ii)*n
         lenw = 10*nlarge*n + 10000
         allocate(work(lenw))
         curvelen = 0
@@ -1121,14 +1121,12 @@ c       evaluate the curve
 c
         curv = 0
         call rsrespnt(t2,z,nlarge,tang,curv,w)
-        call prin2('curv=*',curv,1)
 c
         x=z(1)
         y=z(2)
         dxdt=tang(1)
         dydt=tang(2)
 
-        call prin2('tang=*',tang,2)
 c
 c       normalize the tangents
 c
@@ -1141,8 +1139,6 @@ c       evaluate the guassian perturbations
 c
         curv0 = 0
         call rsrespnt(t2,z,nlarge,tang,curv0,w2(iw))
-        call prin2('curv0=*',curv0,1)
-        call prin2('tang=*',tang,2)
         curv = curv + curv0
 c
         x=x+z(1)
