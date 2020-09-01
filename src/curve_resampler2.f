@@ -41,8 +41,10 @@
         nout = 2*nbl
 
         do i=1,lsave
-          write(33,*) work(i)
+          write(34,*) work(i)
         enddo
+
+
 
 
         if(iert.ne.0) goto 1111
@@ -58,10 +60,8 @@
           ra = ra + xy(2,i)**2
         enddo
         erra = sqrt(erra/ra)
-        call prin2('erra=*',erra,1)
 
-        print *, xver(2),yver(2)
-        stop
+
 
         if(erra.lt.epscheck) goto 1000 
 
@@ -1095,9 +1095,10 @@ c
         m=w(10)
         ixgs=w(11)
         iwhts=w(12)
+        curvelen = w(iw2+3-1)
 c
         call anaptbl(ier,t,nlarge,h,w(its),funcurv_fast,w(iw),w(iw2),
-     1       eps,m,w(ixgs),w(iwhts),w(iwr),w(iwv),nints,tout,
+     1       eps,m,w(ixgs),w(iwhts),w(iwr),w(iwv),nints,curvelen,tout,
      2       x,y,dxdt,dydt,curv)
 c
         return
@@ -3589,7 +3590,7 @@ c
 c 
 c 
          subroutine anaptbl(ier,x,n,h,ts,funcurve,par1,par2,eps,
-     1       mm,xgs,whts,wright,wvals,nints,tout,
+     1       mm,xgs,whts,wright,wvals,nints,rl,tout,
      2       xout,yout,dxdtout,dydtout,curvout)
          implicit real *8 (a-h,o-z)
          real *8 ts(1),xgs(1),whts(1),wright(1),wvals(1)
@@ -3660,8 +3661,13 @@ c
 c 
 c       if the point is outside the user-supplied curve - bomb
 c 
-        if(m .gt. n+1) ier=512
-        if(m .gt. n+1) return
+        if(m .gt. n) ier=512
+        if(m .gt. n) return
+
+        if(m.eq.n) tk = rl
+        if(m.eq.n) goto 3000
+
+        t1 = ts(m+1)
 c
 c       use cubic interpolation to find the approximate location
 c       of the curve parameter (as opposed to the arc-length)
@@ -3671,7 +3677,8 @@ c
         if (m.eq.0) tz(1)=ts(n)-ts(n+1)
         tz(2)=ts(m+1)
         tz(3)=ts(m+2)
-        tz(4)=ts(m+3)
+        if(m.le.n-2) tz(4) = ts(m+3)
+        if(m.le.n-1) tz(4) = ts(n+1)+ts(2)
         xz(1)=(m-1)*h
         xz(2)=m*h
         xz(3)=(m+1)*h
@@ -3775,6 +3782,8 @@ c
 c 
  1400 continue
  2000 continue
+
+ 3000 continue
 c
         tout=tk
         call funcurve(tout,par1,par2,xout,yout,dxdtout,dydtout,curvout)

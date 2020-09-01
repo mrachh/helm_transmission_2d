@@ -43,7 +43,19 @@ MWRAP=../../../mwrap/mwrap
 OBJS = src/hank103.o src/prini.o src/helm_kernels.o  \
 	src/formsysmatbac.o src/kern_mats.o src/lap_kernels.o \
 	src/durdec.o src/corrand4.o src/dumb_conres.o \
-	src/legeexps.o src/curve_resampler.o
+	src/legeexps.o 
+
+ifneq ($(CNEW),ON)
+
+OBJS += src/curve_resampler.f
+
+endif
+
+ifeq ($(CNEW),ON)
+
+OBJS += src/curve_resampler2.f
+
+endif
 
 .PHONY: usage examples matlab debug
 
@@ -109,9 +121,10 @@ mex:  $(STATICLIB)
 #
 
 examples: $(OBJS) examples/ext_dir examples/trans examples/curve 
-	time -p ./examples/int2-dir
-	time -p ./examples/int2-trans
-	time -p ./examples/int2-curve && python plot-curve.py
+#	time -p ./examples/int2-dir
+#	time -p ./examples/int2-trans
+#	time -p ./examples/int2-curve && python plot-curve.py
+	time -p ./examples/int2-curve 
 
 examples/ext_dir:
 	$(FC) $(FFLAGS) examples/ext_dir_solver.f $(OBJS) -o examples/int2-dir -lopenblas $(LDFLAGS) 
