@@ -32,7 +32,7 @@ cc      enddo
       eps = 1.0d-9
 
       ierm = 0
-      nmax = 4
+      nmax = 3
       call simple_curve_resampler_mem(n,xy,nb,eps,nmax,nlarge,
      1   nout,lsave,lused,ierm)
       if(ierm.eq.4) then
@@ -92,10 +92,11 @@ c
 c  test curvature here
 c
       
-      rstart = 0.5d0
-      rend = curvelen*(0.33d0*(1-rstart) + rstart)
+      rstart = 0.33d0
+      rfac = 0.8
+      rend = curvelen*(rfac*(1-rstart) + rstart)
 
-      k = 2*n
+      k = 10*n
       call prinf('k=*',k,1)
       itype = 1
       allocate(ts0(k),wts0(k))
