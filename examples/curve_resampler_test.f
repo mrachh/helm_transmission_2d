@@ -29,7 +29,7 @@ cc      enddo
 
 
       nb = 300
-      eps = 1.0d-1
+      eps = 1.0d-9
 
       ierm = 0
       nmax = 4

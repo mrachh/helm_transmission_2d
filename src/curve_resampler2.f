@@ -100,7 +100,6 @@ c
       nbl = 0
       ier = 0
 
-
       
       call rsblcurve(ier,x0,y0,n,nb,nlarge,curvelen,nbl,
      1   derr,ts,work,lenw,lsave0,lused)
@@ -523,6 +522,7 @@ c
         implicit real *8 (a-h,o-z)
         real *8 xs(n0),ys(n0),w(1),xn(n0),yn(n0),tn(n0),
      1       zs2(2,nlarge+1),ts2(nlarge+1),tang(10),curv(5),z3(10)
+        real *8 der22(2)
 c
 c       subroutine that finds the points on the filtered curve
 c       closest to the given data (xs,ys)
@@ -534,7 +534,7 @@ c
  100    continue
 c
         do 200 i=1,nlarge+1
-        call rsrespnt(ts2(i),zs2(1,i),nlarge,tang,curv,w)
+        call rsrespnt(ts2(i),zs2(1,i),nlarge,tang,der22,w)
  200    continue
 c
         derr=0
@@ -592,7 +592,7 @@ c
         do 600 j=1,niter+1
         t3=t1+(t2-t1)*(j-1)/niter
 c
-        call rsrespnt(t3,z3,nlarge,tang,curv,w)
+        call rsrespnt(t3,z3,nlarge,tang,der22,w)
 c
         dx=xs(i)-z3(1)
         dy=ys(i)-z3(2)
@@ -650,6 +650,7 @@ c
 c
         implicit real *8 (a-h,o-z)
         real *8 w(1),tang(10),curv(5),zt(10)
+        real *8 der22(2)
 
         real *8 witer(200 000),wdist(200 000)
 
@@ -670,19 +671,19 @@ c
         do 100 i=1,50
 c
         tt=ti
-        call rsrespnt(tt,zt,nlarge,tang,curv,w)
+        call rsrespnt(tt,zt,nlarge,tang,der22,w)
         dx=zt(1)-xs
         dy=zt(2)-ys
         ff0=dx*dx+dy*dy
 c
         tt=ti+del
-        call rsrespnt(tt,zt,nlarge,tang,curv,w)
+        call rsrespnt(tt,zt,nlarge,tang,der22,w)
         dx=zt(1)-xs
         dy=zt(2)-ys
         ffu=dx*dx+dy*dy
 c
         tt=ti-del
-        call rsrespnt(tt,zt,nlarge,tang,curv,w)
+        call rsrespnt(tt,zt,nlarge,tang,der22,w)
         dx=zt(1)-xs
         dy=zt(2)-ys
         ffd=dx*dx+dy*dy
@@ -713,19 +714,19 @@ c
         do 300 i=1,3
 c
         tt=ti
-        call rsrespnt(tt,zt,nlarge,tang,curv,w)
+        call rsrespnt(tt,zt,nlarge,tang,der22,w)
         dx=zt(1)-xs
         dy=zt(2)-ys
         ff0=dx*dx+dy*dy
 c
         tt=ti+del
-        call rsrespnt(tt,zt,nlarge,tang,curv,w)
+        call rsrespnt(tt,zt,nlarge,tang,der22,w)
         dx=zt(1)-xs
         dy=zt(2)-ys
         ffu=dx*dx+dy*dy
 c
         tt=ti-del
-        call rsrespnt(tt,zt,nlarge,tang,curv,w)
+        call rsrespnt(tt,zt,nlarge,tang,der22,w)
         dx=zt(1)-xs
         dy=zt(2)-ys
         ffd=dx*dx+dy*dy
@@ -742,7 +743,7 @@ c
  300    continue
 c
         tt=ti
-        call rsrespnt(tt,zt,nlarge,tang,curv,w)
+        call rsrespnt(tt,zt,nlarge,tang,der22,w)
         dx=zt(1)-xs
         dy=zt(2)-ys
         ff0=dx*dx+dy*dy
@@ -757,13 +758,13 @@ c
 c       verify minimum
 c
         tt=ti+del
-        call rsrespnt(tt,zt,nlarge,tang,curv,w)
+        call rsrespnt(tt,zt,nlarge,tang,der22,w)
         dx=zt(1)-xs
         dy=zt(2)-ys
         ffu=dx*dx+dy*dy
 c
         tt=ti-del
-        call rsrespnt(tt,zt,nlarge,tang,curv,w)
+        call rsrespnt(tt,zt,nlarge,tang,der22,w)
         dx=zt(1)-xs
         dy=zt(2)-ys
         ffd=dx*dx+dy*dy
@@ -1109,7 +1110,8 @@ c
         subroutine funcurv_fast(t,w,w2,x,y,dxdt,dydt,curv)
 c
         implicit real *8 (a-h,o-z)
-        real *8 w(1),w2(1),tang(10),curv,z(10),curv0
+        real *8 w(1),w2(1),tang(10),curv,z(10),curv0,der22(2)
+        real *8 d2xdt2,d2ydt2
 c
         n0=w2(1)
         nlarge=w2(2)
@@ -1126,36 +1128,31 @@ c
 c       evaluate the curve
 c
         curv = 0
-        call rsrespnt(t2,z,nlarge,tang,curv,w)
+        call rsrespnt(t2,z,nlarge,tang,der22,w)
 c
         x=z(1)
         y=z(2)
         dxdt=tang(1)
         dydt=tang(2)
+        d2xdt2 = der22(1)
+        d2ydt2 = der22(2)
 
-c
-c       normalize the tangents
-c
-        dtn=dxdt**2+dydt**2
-        dtn=sqrt(dtn)
-        dxdt=dxdt/dtn
-        dydt=dydt/dtn
-        curv = curv/dtn**3
 c
 c       evaluate the guassian perturbations
 c
-        curv0 = 0
-        call rsrespnt(t2,z,nlarge,tang,curv0,w2(iw))
+        call rsrespnt(t2,z,nlarge,tang,der22,w2(iw))
 
-        dtn = sqrt(tang(1)**2 + tang(2)**2)
 
-cc        print *, "curv=",curv
-cc        print *, "curv0=",curv0
-c
         x=x+z(1)
         y=y+z(2)
         dxdt=dxdt+tang(1)
         dydt=dydt+tang(2)
+
+        d2xdt2 = d2xdt2 + der22(1)
+        d2ydt2 = d2ydt2 + der22(2)
+
+        rr = sqrt(dxdt**2 + dydt**2)
+        curv = (dxdt*d2ydt2-dydt*d2xdt2)/rr**3
 c
         return
 c
@@ -1169,7 +1166,7 @@ c
 c
         implicit real*8 (a-h,o-z)
         real *8 w(1), w2(1),
-     1       tang(10), curv(5), z(10)
+     1       tang(10), curv(5), z(10),der22(2)
 c
 c       subroutine to evaluate the curve which is then adjusted
 c       by gaussians
@@ -1182,19 +1179,12 @@ c
 c       evaluate the x,y point along the curve
 c       as well as the derivatives dx/dt and dy/dt
 c
-        call rsrespnt(t,z,nlarge,tang,curv,w)
+        call rsrespnt(t,z,nlarge,tang,der22,w)
 c
         x=z(1)
         y=z(2)
         dxdt=tang(1)
         dydt=tang(2)
-c
-c       normalize the tangents
-c
-        dtn=dxdt**2+dydt**2
-        dtn=sqrt(dtn)
-        dxdt=dxdt/dtn
-        dydt=dydt/dtn
 c
 c       now add the gaussians
 c
@@ -1275,9 +1265,9 @@ c
         ddy=-2*a2*sig*gau*dt/curvelen*sgn
 
         ddx2 = -2*a1*sig*gau/curvelen**2 + 
-     1     4*a1*sig**2*gau*(dt/curvelen)**2
+     1     4*a1*gau*(sig*dt/curvelen)**2
         ddy2 = -2*a2*sig*gau/curvelen**2 + 
-     1     4*a2*sig**2*gau*(dt/curvelen)**2
+     1     4*a2*gau*(sig*dt/curvelen)**2
         
 
 c
@@ -1530,7 +1520,7 @@ c
 c 
 c 
 c 
-        subroutine rsrespnt(t,z,nlarge,tang,curv,w)
+        subroutine rsrespnt(t,z,nlarge,tang,der22,w)
 c
         implicit real *8 (a-h,o-z)
         real *8 z(2),tang(2),w(1),der22(2)
@@ -1579,7 +1569,6 @@ c
         call rsresper(w(its),w(izs),w(ider1),w(ider2),
      1      nlarge,t,w(icoefs),ncoefs,z,tang,der22)
 c 
-        curv=(der22(2)*tang(1)-der22(1)*tang(2))
   
 c 
         return
@@ -3803,12 +3792,10 @@ c
  3000 continue
 c
         tout=tk
-cc        print *, "tout=",tout
         curvout = 0
         call funcurve(tout,par1,par2,xout,yout,dxdtout,dydtout,curvout)
 c 
         d=sqrt(dxdtout**2+dydtout**2)
-cc        print *, "d=",d
         dxdtout=dxdtout/d
         dydtout=dydtout/d
 c 
