@@ -3657,6 +3657,7 @@ c
         ier=0
         d=x/h
         m=d
+        t1 = 0
 c 
 c       if the point is outside the user-supplied curve - bomb
 c 
@@ -3681,6 +3682,13 @@ c
         cz(2)=1
         cz(3)=1
         cz(4)=1
+
+        call prin2('tz=*',tz,4)
+        call prin2('cz=*',cz,4)
+        call prin2('xz=*',xz,4)
+        call prinf('m=*',m,1)
+        call prinf('n=*',n,1)
+
 c
         do 100 i=1,4
         do 200 j=1,4
@@ -3718,6 +3726,11 @@ c
         do 1200 j=1,20
 c
         call findint(wright,nints,tk,ija,ijb)
+          print *, "j=",j
+          print *, "t1=",t1
+          print *, "tk=",tk
+          print *, "ija=",ija
+          print *, "ijb=",ijb
 c
         if (ija.eq.ijb) then
         call anarsblg2(t1,tk,funcurve,

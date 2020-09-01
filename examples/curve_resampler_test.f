@@ -32,7 +32,7 @@ cc      enddo
       eps = 1.0d-1
 
       ierm = 0
-      nmax = 1
+      nmax = 4
       call simple_curve_resampler_mem(n,xy,nb,eps,nmax,nlarge,
      1   nout,lsave,lused,ierm)
       if(ierm.eq.4) then
@@ -100,7 +100,6 @@ c
       itype = 1
       allocate(ts0(k),wts0(k))
       call legeexps(itype,k,ts0,umat,vmat,wts0)
-      stop
 
       curvint = 0
       r1 = 0

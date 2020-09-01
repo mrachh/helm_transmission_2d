@@ -47,13 +47,13 @@ OBJS = src/hank103.o src/prini.o src/helm_kernels.o  \
 
 ifneq ($(CNEW),ON)
 
-OBJS += src/curve_resampler.f
+OBJS += src/curve_resampler.o
 
 endif
 
 ifeq ($(CNEW),ON)
 
-OBJS += src/curve_resampler2.f
+OBJS += src/curve_resampler2.o
 
 endif
 

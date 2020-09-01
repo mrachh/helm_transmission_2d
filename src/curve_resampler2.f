@@ -50,7 +50,7 @@
         if(iert.ne.0) goto 1111
         erra = 0
         ra = 0
-        do i=2,2
+        do i=1,n
           xver(i) = 0
           yver(i) = 0
           call eval_curve(ier,ts(i),work,xver(i),yver(i),dxt,dyt,curv)
@@ -60,8 +60,6 @@
           ra = ra + xy(2,i)**2
         enddo
         erra = sqrt(erra/ra)
-
-
 
         if(erra.lt.epscheck) goto 1000 
 
@@ -3668,6 +3666,7 @@ c
         if(m.eq.n) goto 3000
 
         t1 = ts(m+1)
+        x1 = m*h
 c
 c       use cubic interpolation to find the approximate location
 c       of the curve parameter (as opposed to the arc-length)
@@ -3678,7 +3677,7 @@ c
         tz(2)=ts(m+1)
         tz(3)=ts(m+2)
         if(m.le.n-2) tz(4) = ts(m+3)
-        if(m.le.n-1) tz(4) = ts(n+1)+ts(2)
+        if(m.eq.n-1) tz(4) = ts(n+1)+ts(2)
         xz(1)=(m-1)*h
         xz(2)=m*h
         xz(3)=(m+1)*h
@@ -3688,6 +3687,7 @@ c
         cz(2)=1
         cz(3)=1
         cz(4)=1
+
 c
         do 100 i=1,4
         do 200 j=1,4
@@ -3725,6 +3725,7 @@ c
         do 1200 j=1,20
 c
         call findint(wright,nints,tk,ija,ijb)
+c
 c
         if (ija.eq.ijb) then
         call anarsblg2(t1,tk,funcurve,
