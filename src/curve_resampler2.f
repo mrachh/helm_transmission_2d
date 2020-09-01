@@ -36,13 +36,11 @@
         derr = 0
         nbl = 0
         iert = 0
+        work = 0
         call rsblcurve(iert,x0,y0,n,nb,nlarge,
      1       curvelen,nbl,derr,ts,work,lenw,lsave,lused)
         nout = 2*nbl
 
-        do i=1,lsave
-          write(34,*) work(i)
-        enddo
 
 
 
@@ -1043,7 +1041,8 @@ c
 c
         do 2500 i=1,nlarge+1
         call fungauss(w3(its+i-1),w2,w3(izs+2*i-2),w3(izs+2*i-1),
-     1       w3(ider1+2*i-2),w3(ider1+2*i-1))
+     1       w3(ider1+2*i-2),w3(ider1+2*i-1),w3(ider2+2*i-2),
+     2       w3(ider2+2*i-1))
  2500   continue
 c
 c       shift the parametrization, t, so that the curve
@@ -1141,12 +1140,17 @@ c
         dtn=sqrt(dtn)
         dxdt=dxdt/dtn
         dydt=dydt/dtn
+        curv = curv/dtn**3
 c
 c       evaluate the guassian perturbations
 c
         curv0 = 0
         call rsrespnt(t2,z,nlarge,tang,curv0,w2(iw))
-        curv = curv + curv0
+
+        dtn = sqrt(tang(1)**2 + tang(2)**2)
+
+cc        print *, "curv=",curv
+cc        print *, "curv0=",curv0
 c
         x=x+z(1)
         y=y+z(2)
@@ -1194,7 +1198,7 @@ c
 c
 c       now add the gaussians
 c
-        call fungauss(t,w2,x2,y2,dxdt2,dydt2)
+        call fungauss(t,w2,x2,y2,dxdt2,dydt2,d2xdt2,d2ydt2)
 c
         x=x+x2
         y=y+y2
@@ -1209,7 +1213,7 @@ c
 c
 c
 c
-        subroutine fungauss(t,w,x,y,dxdt,dydt)
+        subroutine fungauss(t,w,x,y,dxdt,dydt,d2xdt2,d2ydt2)
 c
         implicit real *8 (a-h,o-z)
         real *8 w(1)
@@ -1238,6 +1242,8 @@ c
         y=0
         dxdt=0
         dydt=0
+        d2xdt2 = 0
+        d2ydt2 = 0
 c
         do 100 j=1,n0
 c
@@ -1267,12 +1273,22 @@ c
 c
         ddx=-2*a1*sig*gau*dt/curvelen*sgn
         ddy=-2*a2*sig*gau*dt/curvelen*sgn
+
+        ddx2 = -2*a1*sig*gau/curvelen**2 + 
+     1     4*a1*sig**2*gau*(dt/curvelen)**2
+        ddy2 = -2*a2*sig*gau/curvelen**2 + 
+     1     4*a2*sig**2*gau*(dt/curvelen)**2
+        
+
 c
         x=x+dx
         y=y+dy
 c
         dxdt=dxdt+ddx
         dydt=dydt+ddy
+
+        d2xdt2 = d2xdt2 + ddx2
+        d2ydt2 = d2ydt2 + ddy2
 c
  100    continue
 c
@@ -1563,7 +1579,7 @@ c
         call rsresper(w(its),w(izs),w(ider1),w(ider2),
      1      nlarge,t,w(icoefs),ncoefs,z,tang,der22)
 c 
-        curv=der22(2)*tang(1)-der22(1)*tang(2)
+        curv=(der22(2)*tang(1)-der22(1)*tang(2))
   
 c 
         return
@@ -3787,9 +3803,12 @@ c
  3000 continue
 c
         tout=tk
+cc        print *, "tout=",tout
+        curvout = 0
         call funcurve(tout,par1,par2,xout,yout,dxdtout,dydtout,curvout)
 c 
         d=sqrt(dxdtout**2+dydtout**2)
+cc        print *, "d=",d
         dxdtout=dxdtout/d
         dydtout=dydtout/d
 c 
