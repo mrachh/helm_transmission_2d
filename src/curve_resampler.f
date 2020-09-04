@@ -212,12 +212,15 @@ c
         rh = real(zh)
         rdh = real(dzhdt)
         ztmp = z + rh*ima*dzdt/abs(dzdt)
+cc        ztmp = z + rh*ima*dzdt
+
         x = real(ztmp)
         y = imag(ztmp)
         rdot = real(dzdt)*real(d2zdt2) + imag(dzdt)*imag(d2zdt2)
 
-        ztmp = dzdt+rh*ima*d2zdt2/abs(dzdt)+rdh*ima*dzdt/abs(dzdt) -
-     1      rh*ima*dzdt*rdot/abs(dzdt)**3
+cc        ztmp = dzdt+rh*ima*d2zdt2+rdh*ima*dzdt 
+        ztmp = dzdt+rh*ima*d2zdt2/abs(dzdt)+rdh*ima*dzdt/abs(dzdt) 
+     1    - rh*ima*dzdt*rdot/abs(dzdt)**3
         dxdt = real(ztmp)
         dydt = imag(ztmp)
         
@@ -387,6 +390,8 @@ c
         dtp2=0
         dtp3=0
         dtp4=0
+        dtpp0 = 0
+
 c
         do 3000 k=1,n
 cccc         call prinf('in anafast, k=*',k,1)
@@ -406,9 +411,12 @@ c       after the first couple iterations
 c       initialize newton by constructing
 c       cubic extrapolation of previous dt's
 c
+
+   
         ddt0=dtp0
         ddt4=5*dtp0-10*dtp1+10*dtp2-5*dtp3+dtp4
         if(ddt4.le.0) goto 1100
+
 c
         ddd1=abs(dtp0-dtpp0)
         ddd2=abs(ddt4-ddt0)
@@ -512,6 +520,7 @@ c
         t(k+1)=t(k)+dt
 c
  3000   continue
+
 c 
 c       if(jer.ne.0) jer=1
         ier=ier*100+jer*10+ker
