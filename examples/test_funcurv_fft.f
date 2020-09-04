@@ -6,6 +6,7 @@
       complex *16, allocatable :: zh(:),zhf(:),zdhdt(:),zdhdtf(:)
       complex *16, allocatable :: par1(:)
       real *8, allocatable :: wsave1(:),wsave2(:)
+      real *8, allocatable :: xinfo(:,:)
       real *8, allocatable :: work(:),tts(:)
       complex *16 ima
       real *8 par2(100)
@@ -216,7 +217,8 @@
       call prinf('n2=*',n2,1)
       call prin2('rl=*',rl,1)
       work = 0
-      call curve_resampler_guru(ier,n1,n2,par1,rl,nnew,eps,tts,
+      allocate(xinfo(4,nnew))
+      call curve_resampler_guru(ier,n1,n2,par1,rl,nnew,eps,tts,xinfo,
      1  h,rltot,work,lw,lsave)
 
       call prinf('lsave=*',lsave,1)
@@ -225,18 +227,14 @@
       call prin2('h=*',h,1)
 
       do i=1,3
-        call funcurv_fft(tts(i),par1,par2,x3,y3,dxdt3,dydt3)
         ttest = (i-1)*h
         call anafpt(ier,ttest,nnew,h,tts,funcurv_fft,par1,par2,
      1    eps,tout,xout,yout,dxdtout,dydtout,work)
-        dst = sqrt(dxdt3**2 + dydt3**2)
-        dxdt3 = dxdt3/dst
-        dydt3 = dydt3/dst
         print *, "i=",i
-        print *, x3, xout
-        print *, y3, yout
-        print *, dxdt3, dxdtout
-        print *, dydt3, dydtout
+        print *, xinfo(1,i), xout
+        print *, xinfo(2,i), yout
+        print *, xinfo(3,i), dxdtout
+        print *, xinfo(4,i), dydtout
         print *, " "
         print *, " "
       enddo

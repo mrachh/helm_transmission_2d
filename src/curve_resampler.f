@@ -1,6 +1,6 @@
 
        subroutine curve_resampler_guru(ier,nx,nh,par1,rl,n,eps,
-     1     t,h,rltot,w,lw,lsave)
+     1     t,xinfo,h,rltot,w,lw,lsave)
 c 
 c       This subroutine produces an equispaced (in terms
 c       of the arc length) resampling of a user-specified
@@ -52,6 +52,7 @@ c               remedy: increase eps, and/or check your subroutine
 c               funcurve
 c       ier=16000 means that the length of the user-provided work
 c               array, w, is insufficient. this is a fatal error
+c  xinfo(4,n) - boundary data at 
 c  t - the equispaced discretization of the curve. note that the
 c       subroutine will return n+1 values in array t. that is, if the
 c       curve is a closed one, then t(n+1) will be equal to t(1).
@@ -70,7 +71,8 @@ c
       complex *16 par1(*)
       real *8 rl,eps
       integer n
-      real *8 t(n+1),h,w(lw),par2(4)
+      real *8 h,w(lw),par2(4)
+      real *8 xinfo(4,n),t(n+1)
       external funcurv_fft
 
       par2(1) = nx
@@ -88,6 +90,13 @@ c
 
       call anafast(ier,funcurv_fft,par1,par2,rl,n,eps,t,h,rltot,
      1       w,lw,lsave)
+      do i=1,n
+        call funcurv_fft(t(i),par1,par2,xinfo(1,i),xinfo(2,i),
+     1    xinfo(3,i),xinfo(4,i))
+        dst = sqrt(xinfo(3,i)**2 + xinfo(4,i)**2)
+        xinfo(3,i) = xinfo(3,i)/dst
+        xinfo(4,i) = xinfo(4,i)/dst
+      enddo
 
       return
       end

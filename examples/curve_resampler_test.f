@@ -132,6 +132,11 @@ c
 
       erra = abs(r2-r1)
       call prin2('error=*',erra,1)
+
+      lw = 10000
+      allocate(work(lw))
+
+      call curve
       
 
 
