@@ -28,11 +28,11 @@ cc      enddo
       
 
 
-      nb = 300
+      nb = 200
       eps = 1.0d-9
 
       ierm = 0
-      nmax = 3
+      nmax = 1
       call simple_curve_resampler_mem(n,xy,nb,eps,nmax,nlarge,
      1   nout,lsave,lused,ierm)
       if(ierm.eq.4) then
@@ -64,6 +64,7 @@ cc      enddo
       call prinf('nb=*',nb,1)
       call prin2('ts=*',ts,24)
       call prin2('curvelen=*',curvelen,1)
+      print *, "curvelen=",curvelen
       call prin2('curvature=*',srcinfo(6,1:nout),24)
       
       erra = 0

@@ -29,7 +29,7 @@
       epscheck = max(eps,1.0d-12)
  
       do ii=1,nmax
-        nlarge = 4*2**(ii)*n
+        nlarge = 64*2**(ii)*n
         lenw = 10*nlarge*n + 10000
         allocate(work(lenw))
         curvelen = 0
@@ -39,10 +39,7 @@
         work = 0
         call rsblcurve(iert,x0,y0,n,nb,nlarge,
      1       curvelen,nbl,derr,ts,work,lenw,lsave,lused)
-        nout = 2*nbl
-
-
-
+        nout = nlarge
 
 
         if(iert.ne.0) goto 1111
@@ -110,7 +107,7 @@ c
       hout = curvelen/(nout+0.0d0)
       do i=1,nout
         t = (i-1)*hout
-        call eval_curve(ier2,t,wsave,srcinfoout(1,i),srcinfoout(2,i),
+        call eval_curve(ier,t,wsave,srcinfoout(1,i),srcinfoout(2,i),
      1    dxt,dyt,srcinfoout(6,i))
         srcinfoout(5,i) = sqrt(dxt**2 + dyt**2)
         srcinfoout(3,i) = dyt/srcinfoout(5,i)
@@ -1134,6 +1131,11 @@ c
         y=z(2)
         dxdt=tang(1)
         dydt=tang(2)
+
+        dtn = dxdt**2 + dydt**2
+        dtn = sqrt(dtn)
+        dxdt = dxdt/dtn
+        dydt = dydt/dtn
         d2xdt2 = der22(1)
         d2ydt2 = der22(2)
 
@@ -1152,7 +1154,7 @@ c
         d2ydt2 = d2ydt2 + der22(2)
 
         rr = sqrt(dxdt**2 + dydt**2)
-        curv = (dxdt*d2ydt2-dydt*d2xdt2)/rr**3
+        curv = 0 
 c
         return
 c
@@ -1682,7 +1684,6 @@ c
 c 
         function irsrwrap(m,i)
 c 
-        save
         if( (i .le. m) .and. (i .ge. 1)) then
            irsrwrap=i
            return

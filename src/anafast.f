@@ -51,7 +51,6 @@ c
         if (it.eq.1) call anafast(ier,funcurv3,par1,par2,
      1       rl,n,eps,t,h,rltot,work,lw,lsave)
 
-        stop
 c
 cccc        call prinf('after anafast, ier = *',ier,1)
 cccc        call prin2('after anafast, rltot = *',rltot,1)
