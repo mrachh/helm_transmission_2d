@@ -1,4 +1,96 @@
-  
+
+       subroutine curve_resampler_guru(ier,nx,nh,par1,rl,n,eps,
+     1     t,h,rltot,w,lw,lsave)
+c 
+c       This subroutine produces an equispaced (in terms
+c       of the arc length) resampling of a user-specified
+c       curve. The curve is specified using the routine
+c       funcurv_fft whose parameters are supplied by the user above.
+c       
+c       Explanation: this subroutine
+c       assumes that the curve to be resampled is defined by the
+c       mapping
+c 
+c            [0,rl] \to R^2,
+c 
+c       with the mapping and its derivatives provided via
+c       the user-supplied subroutine funcurve (see specifications
+c       below). The curve does not need to be closed.
+c 
+c 
+c                    input parameters:
+c  nx = number of terms in fourier expansion of x,y,dxdt,dydt
+c  nh = number of terms in the fourier expansion of h
+c  par1 = fourier coeffs of x+ima*y, dxdt+ima*dydt
+c  rl - the length of the t-interval.
+c  n - the number of subintervals into which the curve is to be
+c       subdivided.
+c  eps - the precision with which all operations are to be performed.
+c       recommended value: 1.0d-15
+c 
+c                    output parameters:
+c 
+c  ier - error return code.
+c       ier=0   means normal completion
+c       ier=1   means that the discretization might not be
+c               sufficiently fine to describe the curve.
+c               remedy: increase n. also note that this is
+c               an extremely minor problem. what it really
+c               says is that the newton process used by
+c               the subroutine to find equispaced nodes on
+c               the curve had to activate the step-length
+c               control procedure at least once.
+c       ier=10  means that the adaptive gaussian quadrature
+c               used by the subroutine failed to obtain
+c               the accuracy requested by the user at least
+c               once. this is fairly serious.
+c               remedy: increase eps, and/or check your subroutine
+c               funcurve
+c       ier=100 means that the newton process failed
+c               to converge at least once. this is very serious.
+c               remedy: increase eps, and/or check your subroutine
+c               funcurve
+c       ier=16000 means that the length of the user-provided work
+c               array, w, is insufficient. this is a fatal error
+c  t - the equispaced discretization of the curve. note that the
+c       subroutine will return n+1 values in array t. that is, if the
+c       curve is a closed one, then t(n+1) will be equal to t(1).
+c  h - the sampling interval along the arc of the resampling returned
+c       in array t
+c  w - work array; suggested length of 1000 real *8, but see
+c       ier=16000 if more space is needed
+c  lsave - the number of elements of w that should not be changed
+c         between the call to this subroutine and the subsequent calls
+c         to anafpt
+c
+c       . . . determine the total length of the curve
+c
+      implicit real *8 (a-h,o-z)
+      integer nx,nh
+      complex *16 par1(*)
+      real *8 rl,eps
+      integer n
+      real *8 t(n+1),h,w(lw),par2(4)
+      external funcurv_fft
+
+      par2(1) = nx
+      par2(2) = nh
+      par2(3) = max(nx,nh)
+      par2(4) = rl
+
+      do i=1,n+1
+        t(i) = 0
+      enddo
+
+      rltot = 0
+      h = 0
+      lsave = 0
+
+      call anafast(ier,funcurv_fft,par1,par2,rl,n,eps,t,h,rltot,
+     1       w,lw,lsave)
+
+      return
+      end
 c 
 c 
 c 
@@ -119,14 +211,13 @@ c
 
         rh = real(zh)
         rdh = real(dzhdt)
-        call prin2('zh=*',zh,2)
-        call prin2('dzhdt=*',dzhdt,2)
-        call prin2('d2zdt2=*',d2zdt2,2)
-        ztmp = z + rh*ima*(dzdt)
+        ztmp = z + rh*ima*dzdt/abs(dzdt)
         x = real(ztmp)
         y = imag(ztmp)
+        rdot = real(dzdt)*real(d2zdt2) + imag(dzdt)*imag(d2zdt2)
 
-        ztmp = dzdt + rh*ima*d2zdt2+rdh*ima*dzdt
+        ztmp = dzdt+rh*ima*d2zdt2/abs(dzdt)+rdh*ima*dzdt/abs(dzdt) -
+     1      rh*ima*dzdt*rdot/abs(dzdt)**3
         dxdt = real(ztmp)
         dydt = imag(ztmp)
         
@@ -449,7 +540,6 @@ c
  100    continue
 c
         return
-c
         end
 c 
 c 

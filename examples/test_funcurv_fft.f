@@ -6,9 +6,11 @@
       complex *16, allocatable :: zh(:),zhf(:),zdhdt(:),zdhdtf(:)
       complex *16, allocatable :: par1(:)
       real *8, allocatable :: wsave1(:),wsave2(:)
+      real *8, allocatable :: work(:),tts(:)
       complex *16 ima
       real *8 par2(100)
       data ima/(0.0d0,1.0d0)/
+      external funcurv_fft
 
       call prini(6,13)
       done = 1
@@ -108,8 +110,6 @@
       do i=1,n1
         zf(i) = zf(i)/n1
         dzdtf(i) = dzdtf(i)/n1
-        write(37,*) real(zf(i)),imag(zf(i))
-        write(38,*) real(dzdtf(i)),imag(dzdtf(i))
       enddo
 
       call zfftf(n2,zhf,wsave2)
@@ -118,8 +118,6 @@
       do i=1,n2
         zhf(i) = zhf(i)/n2
         zdhdtf(i) = zdhdtf(i)/n2
-        write(39,*) real(zhf(i)),imag(zhf(i))
-        write(40,*) real(zdhdtf(i)),imag(zdhdtf(i))
       enddo
 
       call prin2('done with ffts*',i,0)
@@ -162,17 +160,24 @@
      1     d2rdt2*sin(targ)
         print *, d2xdt2,d2ydt2
 
-        xex(i) = xex(i) - r3*sin(nosch*targ)*dyex(i)
-        yex(i) = yex(i) + r3*sin(nosch*targ)*dxex(i)
+        dst = sqrt(dxex(i)**2 + dyex(i)**2)
+
+        xex(i) = xex(i) - r3*sin(nosch*targ)*dyex(i)/dst
+        yex(i) = yex(i) + r3*sin(nosch*targ)*dxex(i)/dst
 
         dy0 = dyex(i)
         dx0 = dxex(i)
 
-        dxex(i) = dxex(i) - r3*sin(nosch*targ)*d2ydt2 - 
-     1     r3*rc*nosch*cos(nosch*targ)*dy0
-        print *, "rdh=",r3*rc*nosch*cos(nosch*targ)
-        dyex(i) = dyex(i) + r3*sin(nosch*targ)*d2xdt2 + 
-     1     r3*rc*nosch*cos(nosch*targ)*dx0
+        rdot = dx0*d2xdt2 + dy0*d2ydt2
+        print *, "rdot=",rdot
+        print *, "dst=",dst
+
+        dxex(i) = dxex(i) - r3*sin(nosch*targ)*d2ydt2/dst - 
+     1     r3*rc*nosch*cos(nosch*targ)*dy0/dst + 
+     2     r3*sin(nosch*targ)*dy0*rdot/dst**3
+        dyex(i) = dyex(i) + r3*sin(nosch*targ)*d2xdt2/dst + 
+     1     r3*rc*nosch*cos(nosch*targ)*dx0/dst -
+     2     r3*sin(nosch*targ)*dx0*rdot/dst**3
         
         erra = erra + (xex(i)-x(i))**2
         erra = erra + (yex(i)-y(i))**2
@@ -180,6 +185,7 @@
         erra = erra + (dyex(i)-dydt(i))**2
 
         if(i.le.2) print *, x(i)/xex(i)
+        if(i.le.2) print *, dyex(i),dydt(i)
 
         ra = ra + xex(i)**2
       enddo
@@ -191,7 +197,52 @@
       call prin2('dydt=*',dydt,24)
       call prin2('dyex=*',dyex,24)
 
+      call prin2('dxdt=*',dxdt,24)
+      call prin2('dxex=*',dxex,24)
+
       call prin2('erra=*',erra,1)
+
+      lw = 100000
+      allocate(work(lw))
+
+      nnew = 100
+      ier = 0
+      eps = 1.0d-13
+      lsave = 0 
+      allocate(tts(nnew+1))
+      print *, "here"
+      call prin2('par1=*',par1,24)
+      call prinf('n1=*',n1,1)
+      call prinf('n2=*',n2,1)
+      call prin2('rl=*',rl,1)
+      call curve_resampler_guru(ier,n1,n2,par1,rl,nnew,eps,tts,
+     1  h,rltot,work,lw,lsave)
+
+      call prinf('lsave=*',lsave,1)
+      call prin2('rltot=*',rltot,1)
+      call prin2('tts=*',tts,24)
+      call prin2('h=*',h,1)
+
+      do i=1,3
+        call funcurv_fft(tts(i),par1,par2,x3,y3,dxdt3,dydt3)
+        call anafpt(ier,tts(i),nnew,h,tts,funcurv_fft,par1,par2,
+     1    eps,tout,xout,yout,dxdtout,dydtout,work)
+        dst = sqrt(dxdt3**2 + dydt3**2)
+        dxdt3 = dxdt3/dst
+        dydt3 = dydt3/dst
+        print *, "i=",i
+        print *, x3, xout
+        print *, y3, yout
+        print *, dxdt3, dxdtout
+        print *, dydt3, dydtout
+        print *, " "
+        print *, " "
+      enddo
+      
+
+
+      
+      
 
 
       stop
