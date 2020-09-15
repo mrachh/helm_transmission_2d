@@ -62,8 +62,6 @@ function [varargout] = resample_curve(srcinfo,h,rl,nh,hcoefs,nout,eps)
   else
     fprintf('invalid number of arguments\n');
   end
-  
-  disp(nuse)
   xfft = fft(srcinfo(1,1:n))/n;
   yfft = fft(srcinfo(2,1:n))/n;
   dxdt = srcinfo(4,:).*srcinfo(5,:)*2*pi/rl;

@@ -616,7 +616,7 @@ MWF77_RETURN MWF77_curve_resampler_guru(size_t*, size_t*, size_t*, dcomplex*, do
 #endif
 
 /* ---- curve_resampler.mw: 109 ----
- * curve_resampler_guru(inout size_t[1] ier, size_t[1] n, size_t[1] nhuse, dcomplex[npar1] par1, double[1] rl, size_t[1] nuse, double[1] eps, inout double[nn] tts, inout double[4, nuse] sinfo, inout double[1] hout, inout double[1] rltot, inout double[lw] work, size_t[1] lw, inout size_t[1] lsave);
+ * curve_resampler_guru(inout size_t[1] ier, size_t[1] n, size_t[1] nhuse, dcomplex[npar1] par1, double[1] rl, size_t[1] nuse, double[1] epsuse, inout double[nn] tts, inout double[4, nuse] sinfo, inout double[1] hout, inout double[1] rltot, inout double[lw] work, size_t[1] lw, inout size_t[1] lsave);
  */
 static const char* stubids1_ = "curve_resampler_guru(io size_t[x], i size_t[x], i size_t[x], i dcomplex[x], i double[x], i size_t[x], i double[x], io double[x], io double[xx], io double[x], io double[x], io double[x], i size_t[x], io size_t[x])";
 
@@ -630,7 +630,7 @@ void mexStub1(int nlhs, mxArray* plhs[],
     dcomplex*   in3_ =0; /* par1       */
     double*     in4_ =0; /* rl         */
     size_t*     in5_ =0; /* nuse       */
-    double*     in6_ =0; /* eps        */
+    double*     in6_ =0; /* epsuse     */
     double*     in7_ =0; /* tts        */
     double*     in8_ =0; /* sinfo      */
     double*     in9_ =0; /* hout       */
@@ -695,7 +695,7 @@ void mexStub1(int nlhs, mxArray* plhs[],
     }
 
     if (mxGetM(prhs[6])*mxGetN(prhs[6]) != dim20_) {
-        mw_err_txt_ = "Bad argument size: eps";        goto mw_err_label;
+        mw_err_txt_ = "Bad argument size: epsuse";        goto mw_err_label;
     }
 
     if (mxGetM(prhs[7])*mxGetN(prhs[7]) != dim21_) {
