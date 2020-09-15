@@ -62,6 +62,8 @@ function [varargout] = resample_curve(srcinfo,h,rl,nh,hcoefs,nout,eps)
   else
     fprintf('invalid number of arguments\n');
   end
+  
+  disp(nuse)
   xfft = fft(srcinfo(1,1:n))/n;
   yfft = fft(srcinfo(2,1:n))/n;
   dxdt = srcinfo(4,:).*srcinfo(5,:)*2*pi/rl;
@@ -101,7 +103,7 @@ function [varargout] = resample_curve(srcinfo,h,rl,nh,hcoefs,nout,eps)
   lsave = 0;
   
   mex_id_ = 'curve_resampler_guru(io size_t[x], i size_t[x], i size_t[x], i dcomplex[x], i double[x], i size_t[x], i double[x], io double[x], io double[xx], io double[x], io double[x], io double[x], i size_t[x], io size_t[x])';
-[ier, tts, sinfo, hout, rltot, work, lsave] = curve_resampler(mex_id_, ier, n, nhuse, par1, rl, nuse, eps, tts, sinfo, hout, rltot, work, lw, lsave, 1, 1, 1, npar1, 1, 1, 1, nn, 4, nuse, 1, 1, lw, 1, 1);
+[ier, tts, sinfo, hout, rltot, work, lsave] = curve_resampler(mex_id_, ier, n, nhuse, par1, rl, nuse, epsuse, tts, sinfo, hout, rltot, work, lw, lsave, 1, 1, 1, npar1, 1, 1, 1, nn, 4, nuse, 1, 1, lw, 1, 1);
   
   srcinfoout = zeros(6,nuse);
   srcinfoout(1,:) = sinfo(1,:);

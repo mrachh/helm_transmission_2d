@@ -15,7 +15,7 @@ nh = 15;
 hcoefs = rand(2*nh+1,1)*0.1;
 
 rlin = 2*pi;
-nout = n;
+nout = 460;
 [srcinfoout,hout,rltot,ier,tts] = resample_curve(srcinfo, ...
   h,rlin,nh,hcoefs,nout,eps);
 figure(1)

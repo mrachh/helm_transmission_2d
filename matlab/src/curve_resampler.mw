@@ -106,7 +106,7 @@
   rltot = 0.0;
   lsave = 0;
   
-  # FORTRAN curve_resampler_guru(inout int[1] ier, int[1] n, int[1] nhuse, dcomplex[npar1] par1, double[1] rl, int[1] nuse, double[1] eps, inout double[nn] tts, inout double[4,nuse] sinfo, inout double[1] hout, inout double[1] rltot, inout double[lw] work, int[1] lw, inout int[1] lsave);  
+  # FORTRAN curve_resampler_guru(inout int[1] ier, int[1] n, int[1] nhuse, dcomplex[npar1] par1, double[1] rl, int[1] nuse, double[1] epsuse, inout double[nn] tts, inout double[4,nuse] sinfo, inout double[1] hout, inout double[1] rltot, inout double[lw] work, int[1] lw, inout int[1] lsave);  
   
   srcinfoout = zeros(6,nuse);
   srcinfoout(1,:) = sinfo(1,:);
