@@ -1,6 +1,7 @@
 %driver 
 clear
 
+addpath('./src')
 %boundaydx
 N_bd             = 3;
 coefs_bd         = zeros(1,2*N_bd+1);
