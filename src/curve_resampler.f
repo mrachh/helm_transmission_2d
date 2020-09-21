@@ -220,7 +220,7 @@ c
 
         rh = real(zh)
         rdh = real(dzhdt)
-        ztmp = z + rh*ima*dzdt/abs(dzdt)
+        ztmp = z - rh*ima*dzdt/abs(dzdt)
 cc        ztmp = z + rh*ima*dzdt
 
         x = real(ztmp)
@@ -228,8 +228,8 @@ cc        ztmp = z + rh*ima*dzdt
         rdot = real(dzdt)*real(d2zdt2) + imag(dzdt)*imag(d2zdt2)
 
 cc        ztmp = dzdt+rh*ima*d2zdt2+rdh*ima*dzdt 
-        ztmp = dzdt+rh*ima*d2zdt2/abs(dzdt)+rdh*ima*dzdt/abs(dzdt) 
-     1    - rh*ima*dzdt*rdot/abs(dzdt)**3
+        ztmp = dzdt-rh*ima*d2zdt2/abs(dzdt)-rdh*ima*dzdt/abs(dzdt) 
+     1    + rh*ima*dzdt*rdot/abs(dzdt)**3
         dxdt = real(ztmp)
         dydt = imag(ztmp)
         

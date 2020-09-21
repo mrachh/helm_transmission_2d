@@ -34,6 +34,7 @@ H     = ( dxs .* d2ys - dys .* d2xs )  ./ ( ds.^3 );
 L    = length(ds)*h_bd  
 
 var_up        = zeros(1,2*N_bd+1);    
+var_up(1) = 0.3;
 src_info      = zeros(5,n_bd);
 src_info(1,:) = xs;
 src_info(2,:) = ys;
@@ -51,6 +52,9 @@ ds1   = srcout(5,:);
 dxs1  = -srcout(4,:).*srcout(5,:);
 dys1  = srcout(3,:).*srcout(5,:);
 src_info1     = srcout;
+err = max(abs(srcout(1,:).^2 + srcout(2,:).^2 - (2+var_up(1)).^2));
+disp(err)
+
 
 [srcout1,hout1,Lout1,~,~] = resample_curve(src_info1,Lout,N_bd,var_up',n_bd);    
 xs2   = srcout1(1,:);
@@ -65,3 +69,5 @@ max(abs(ys1-ys2))
 max(abs(xs1-xs2))
 max(abs(dys1-dys2))
 max(abs(dxs1-dxs2))
+err = max(abs(srcout1(1,:).^2 + srcout1(2,:).^2 - (2+2*var_up(1)).^2));
+disp(err)

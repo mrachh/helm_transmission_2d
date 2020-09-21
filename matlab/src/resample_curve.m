@@ -79,14 +79,15 @@ function [varargout] = resample_curve(srcinfo,rl,nh,hcoefs,nout,eps)
 
  
   hfft = zeros(nhuse,1);
-  hfft(1:(nh+1)) = hcoefs(1:(nh+1))/2;
+  hfft(1) = hcoefs(1)
+  hfft(2:(nh+1)) = hcoefs(2:(nh+1))/2;
   hfft((nh+2):nhuse) = flip(hcoefs(2:(nh+1)))/2;
   hfft(2:(nh+1)) = hfft(2:(nh+1))+hcoefs((nh+2):nhuse)/2/1j;
   hfft((nh+2):nhuse) = hfft((nh+2):nhuse)-flip(hcoefs((nh+2):nhuse))/2/1j;
   dhfft = zeros(nhuse,1);
   dhfft(2:(nh+1)) = hfft(2:(nh+1))*1j.*(1:nh)'*2*pi/rl;
   dhfft((nh+2):nhuse) = -hfft((nh+2):nhuse)*1j.*flip(1:nh)'*2*pi/rl;
-  par1((2*n+1):(2*n+nhuse)) = hfft/nhuse;
+  par1((2*n+1):(2*n+nhuse)) = hfft;
   par1((2*n+nhuse+1):(2*(n+nhuse))) = dhfft/nhuse;
 
   
