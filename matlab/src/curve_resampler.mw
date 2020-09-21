@@ -4,7 +4,7 @@
 %  for resampling a curve with a given bandwidth
 % 
 %
-@function [varargout] = resample_curve(srcinfo,h,rl,nh,hcoefs,nout,eps)
+@function [varargout] = resample_curve(srcinfo,rl,nh,hcoefs,nout,eps)
 %
 %  This subroutine resamples a given curve whose xy 
 %  and attempts to pass a bandlimited curve thorugh them.
@@ -56,13 +56,13 @@
     return;
   end
 
-  if (nargin == 5)
+  if (nargin == 4)
     epsuse = 1e-13;
     nuse = n + 4*nh;
-  elseif (nargin == 6)
+  elseif (nargin == 5)
     epsuse = 1e-13;
     nuse = nout;
-  elseif (nargin == 7)
+  elseif (nargin == 6)
     epsuse = eps;
     nuse = nout;
   else
@@ -70,8 +70,8 @@
   end
   xfft = fft(srcinfo(1,1:n))/n;
   yfft = fft(srcinfo(2,1:n))/n;
-  dxdt = srcinfo(4,:).*srcinfo(5,:)*2*pi/rl;
-  dydt = -srcinfo(3,:).*srcinfo(5,:)*2*pi/rl;
+  dxdt = -srcinfo(4,:).*srcinfo(5,:);
+  dydt = srcinfo(3,:).*srcinfo(5,:);
   dxfft = fft(dxdt)/n;
   dyfft = fft(dydt)/n;
 
