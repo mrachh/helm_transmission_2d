@@ -8,7 +8,6 @@ dy_s  = src(4,:);
 x_t   = tgt(1,:);
 y_t   = tgt(2,:);
 
-% n = length(x_s);
 m = length(x_t);
 
 rr = sqrt(bsxfun(@minus,x_t',x_s).^2 + bsxfun(@minus,y_t',y_s).^2);
