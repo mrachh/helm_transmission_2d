@@ -68,7 +68,9 @@ err = max(abs(srcout(4,:) - (-dxs./ds)));
 disp(err)
 return
 
-[srcout1,hout1,Lout1,~,~] = resample_curve(src_info1,Lout,N_bd,var_up',n_bd);    
+var_up(1) = 0;
+var_up(4) = 0.5;
+[srcout1,hout1,Lout1,~,tt] = resample_curve(src_info1,Lout,N_bd,var_up',n_bd);    
 xs2   = srcout1(1,:);
 ys2   = srcout1(2,:);
 ds2   = srcout1(5,:);
@@ -81,5 +83,17 @@ max(abs(ys1-ys2))
 max(abs(xs1-xs2))
 max(abs(dys1-dys2))
 max(abs(dxs1-dxs2))
-err = max(abs(srcout1(1,:).^2 + srcout1(2,:).^2 - (2+2*var_up(1)).^2));
-disp(err)
+
+% Need to rescale tt between (0,2*pi) because that was the new
+% arclength parameterization of src_info1
+tt = 2*pi*tt/Lout; 
+rex = 2+var_up(1) + var_up(4)*cos(3*tt');
+drdtex = -3*var_up(4)*sin(3*tt');
+dxsex = -rex.*sin(tt') + drdtex.*cos(tt');
+dysex = rex.*cos(tt') + drdtex.*sin(tt');
+dsdtex = sqrt(dxsex.^2 + dysex.^2);
+rnxex = dysex./dsdtex;
+rnxerr = max(abs(srcout1(3,:)-rnxex));
+xerr = max(abs(rex.*cos(tt')-srcout1(1,:)));
+disp(rnxerr)
+disp(xerr)
