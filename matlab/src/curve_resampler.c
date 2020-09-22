@@ -615,7 +615,7 @@ MWF77_RETURN MWF77_curve_resampler_guru(size_t*, size_t*, size_t*, dcomplex*, do
 } /* end extern C */
 #endif
 
-/* ---- curve_resampler.mw: 109 ----
+/* ---- curve_resampler.mw: 110 ----
  * curve_resampler_guru(inout size_t[1] ier, size_t[1] n, size_t[1] nhuse, dcomplex[npar1] par1, double[1] rl, size_t[1] nuse, double[1] epsuse, inout double[nn] tts, inout double[4, nuse] sinfo, inout double[1] hout, inout double[1] rltot, inout double[lw] work, size_t[1] lw, inout size_t[1] lsave);
  */
 static const char* stubids1_ = "curve_resampler_guru(io size_t[x], i size_t[x], i size_t[x], i dcomplex[x], i double[x], i size_t[x], i double[x], io double[x], io double[xx], io double[x], io double[x], io double[x], i size_t[x], io size_t[x])";
@@ -877,7 +877,7 @@ void mexFunction(int nlhs, mxArray* plhs[],
     } else if (strcmp(id, "*profile report*") == 0) {
         if (!mexprofrecord_)
             mexPrintf("Profiler inactive\n");
-        mexPrintf("%d calls to curve_resampler.mw:109\n", mexprofrecord_[1]);
+        mexPrintf("%d calls to curve_resampler.mw:110\n", mexprofrecord_[1]);
     } else if (strcmp(id, "*profile log*") == 0) {
         FILE* logfp;
         if (nrhs != 2 || mxGetString(prhs[1], id, sizeof(id)) != 0)
@@ -887,7 +887,7 @@ void mexFunction(int nlhs, mxArray* plhs[],
             mexErrMsgTxt("Cannot open log for output");
         if (!mexprofrecord_)
             fprintf(logfp, "Profiler inactive\n");
-        fprintf(logfp, "%d calls to curve_resampler.mw:109\n", mexprofrecord_[1]);
+        fprintf(logfp, "%d calls to curve_resampler.mw:110\n", mexprofrecord_[1]);
         fclose(logfp);
     } else
         mexErrMsgTxt("Unknown identifier");
