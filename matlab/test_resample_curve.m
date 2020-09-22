@@ -32,9 +32,11 @@ d3xs  = d3p_t .* c_t + d2p_t .*(-s_t) - 2 * (d2p_t .* s_t + dp_t .* c_t) - (dp_t
 d3ys  = d3p_t .* s_t + d2p_t .* c_t + 2 * (d2p_t .* c_t - dp_t .* s_t) - (dp_t .* s_t + p_t .* c_t);
 ds    = sqrt(dxs.^2 + dys.^2);
 H     = ( dxs .* d2ys - dys .* d2xs )  ./ ( ds.^3 );
-L    = length(ds)*h_bd  
+L     = length(ds)*h_bd  
 
 var_up        = zeros(1,2*N_bd+1);    
+var_up(1) = 0;
+var_up(4) = 0.1;
 src_info      = zeros(5,n_bd);
 src_info(1,:) = xs;
 src_info(2,:) = ys;
@@ -53,7 +55,18 @@ dxs1  = -srcout(4,:).*srcout(5,:);
 dys1  = srcout(3,:).*srcout(5,:);
 src_info1     = srcout;
 err = max(abs(srcout(1,:) - (2+var_up(1)+var_up(4)*cos(3*tt')).*cos(tt')));
-
+disp(err)
+err = max(abs(srcout(2,:) - (2+var_up(1)+var_up(4)*cos(3*tt')).*sin(tt')));
+disp(err)
+dht = -3*var_up(4)*sin(3*tt');
+dxs = dht .*cos(tt')-(2+var_up(1)+var_up(4)*cos(3*tt')).*sin(tt');
+dys = dht .*sin(tt')+(2+var_up(1)+var_up(4)*cos(3*tt')).*cos(tt');
+ds  = sqrt(dxs.^2+dys.^2);
+err = max(abs(srcout(3,:) - dys./ds));
+disp(err)
+err = max(abs(srcout(4,:) - (-dxs./ds)));
+disp(err)
+return
 
 var_up(1) = 0;
 var_up(4) = 0.5;
