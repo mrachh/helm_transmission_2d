@@ -14,7 +14,9 @@ FC=gfortran
 
 FFLAGS= -fPIC -O3 -march=native -funroll-loops -std=legacy -w 
 CFLAGS= -std=c99 
-CFLAGS+= $(FFLAGS) 
+CFLAGS+= $(FFLAGS)
+LDFLAGS="-L/usr/local/opt/openblas/lib"
+CPPFLAGS="-I/usr/local/opt/openblas/include" 
 
 CLINK = -lgfortran -lm -ldl
 
@@ -94,7 +96,7 @@ matlab:	$(STATICLIB) matlab/src/$(GATEWAY).c matlab/src/$(GATEWAY2).c matlab/src
 
 
 mex:  $(STATICLIB)
-	cd matlab; cd src; $(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY) -mb $(MWRAPFILE).mw;\
+	cd matlab; cd src;  $(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY) -mb $(MWRAPFILE).mw;\
 	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY) -c $(GATEWAY).c $(MWRAPFILE).mw;\
 	$(MEX) $(GATEWAY).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE) $(MEX_LIBS); \
 	$(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY2) -mb $(MWRAPFILE2).mw;\
