@@ -84,3 +84,18 @@ rnxerr = max(abs(srcout1(3,:)-rnxex));
 xerr = max(abs(rex.*cos(tt')-srcout1(1,:)));
 disp(rnxerr)
 disp(xerr)
+
+src = [0.01;-0.07];
+targ = [12.1;5.2];
+zk = complex(1.1);
+uex = helm_c_p(zk,src,targ);
+rhs = helm_c_p(zk,src,srcout1);
+
+D = specdiffmat(n_bd,srcout1);
+rhsdiff = D*rhs*2*pi/Lout1;
+
+[ux,uy] = helm_c_g(zk,src,srcout1);
+rhs_diff_exact =  -ux.*srcout1(4,:)' + uy.*srcout1(3,:)';
+err = norm(rhsdiff-rhs_diff_exact);
+fprintf("Error in diff mat = %d\n\n\n",err);
+
