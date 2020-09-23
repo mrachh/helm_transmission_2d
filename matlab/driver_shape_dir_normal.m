@@ -1,6 +1,9 @@
 %driver 
 clear
 
+addpath('../kress')
+addpath('./src')
+
 %bounday
 N_bd             = 3;
 coefs_bd         = zeros(1,2*N_bd+1);
@@ -35,8 +38,8 @@ for ik = 1 : length(khv)
          
     %generating the object
     n_bd  = ceil(32*kh);
-    if (n_bd < 128)
-        n_bd = 128;
+    if (n_bd < 300)
+        n_bd = 300;
     end
     t_bd  = 0:2*pi/n_bd:2*pi-2*pi/n_bd;
     h_bd  = 2*pi/n_bd;    
@@ -97,13 +100,13 @@ for ik = 1 : length(khv)
     %remember to rescale
     norder = 16;
     rsc = 2*pi/L;
-    S  = slp_mat(kh,norder,h_bd,src_info);%*rsc;
-    Sp = sprime_ext_mat(kh,norder,h_bd,src_info);%*rsc;
-    D  = dlp_ext_mat(kh,norder,h_bd,src_info);%*rsc;
+    S  = slp_mat(kh,norder,h_bd,src_info);
+    Sp = sprime_ext_mat(kh,norder,h_bd,src_info);
+    D  = dlp_ext_mat(kh,norder,h_bd,src_info);
     Der = specdiffmat(n_bd,src_info)*rsc;    
     T = Der * S * Der  + kh^2 * (bsxfun(@times,bsxfun(@times,(dys./ds)',S),dys./ds) + ...
         bsxfun(@times,bsxfun(@times,(dxs./ds)',S),dxs./ds));
-
+    
     %operators to target
     S_tgt = slmat_out(kh,h_bd,src,tgt);
     D_tgt = dlmat_out(kh,h_bd,src,tgt);    
@@ -128,20 +131,24 @@ for ik = 1 : length(khv)
     ubd(ik).data   = (D + 1i * eta * S) * pot ;
     dubd(ik).data  = (T + 1i * eta * Sp) * pot;
     
-    umeas_sing = S_tgt*pots;
-    ubd_sing   = S*pots;
-    dubd_sing  = Sp*pots;
-    max(max(abs(umeas(ik).data-umeas_sing)))
-    max(max(abs(ubd(ik).data-ubd_sing)))
-    max(max(abs(dubd(ik).data-dubd_sing)))
-    
-    umeas_db = D_tgt*potd;
-    ubd_db   = D*potd;
-    dubd_db  = T*potd;
-    max(max(abs(umeas(ik).data-umeas_db)))
-    max(max(abs(ubd(ik).data-ubd_db)))
-    max(max(abs(dubd(ik).data-dubd_db)))    
-    pause
+%     umeas_sing = S_tgt*pots;
+%     ubd_sing   = S*pots;
+%     dubd_sing  = Sp*pots;
+%     max(max(abs(umeas(ik).data-umeas_sing)))
+%     max(max(abs(ubd(ik).data-ubd_sing)))
+%     max(max(abs(dubd(ik).data-dubd_sing)))
+%     
+%     umeas_db = D_tgt*potd;
+%     ubd_db   = D*potd;
+%     dubd_db  = T*potd;
+%     max(max(abs(umeas(ik).data-umeas_db)))
+%     max(max(abs(ubd(ik).data-ubd_db)))
+%     max(max(abs(dubd(ik).data-dubd_db)))    
+%     
+%     max(max(abs(umeas_sing-umeas_db)))
+%     max(max(abs(ubd_sing-ubd_db)))
+%     max(max(abs(dubd_sing-dubd_db)))    
+%     pause
     
     % checking the domain update    
     for iup = 1: 2* N_bd+1
@@ -151,10 +158,10 @@ for ik = 1 : length(khv)
         var_up(iup) = delta;           
         
         %generating new domain        
-        [srcout,hout,Lout,~,~] = resample_curve(src_info,L,N_bd,var_up',n_bd);                
+        [srcout,hout,Lout,~,~] = resample_curve(src_info,L,N_bd,var_up');                
         L1    = Lout;
-        t_bd1 = 0:hout:(Lout-hout);
         h_bd1 = hout;
+        t_bd1 = 0:h_bd1:(L1-h_bd1);        
         xs1  = srcout(1,:);
         ys1  = srcout(2,:);
         dxs1 = -srcout(4,:) .* srcout(5,:);
@@ -175,9 +182,9 @@ for ik = 1 : length(khv)
         %generating operators
         norder = 16;
         rsc1 = 2*pi/L1;
-        S1  = slp_mat(kh,norder,h_bd1,src_info1);%*rsc1;
-        Sp1 = sprime_ext_mat(kh,norder,h_bd1,src_info1);%*rsc1;
-        D1  = dlp_ext_mat(kh,norder,h_bd1,src_info1);%*rsc1;
+        S1  = slp_mat(kh,norder,h_bd1,src_info1);
+        Sp1 = sprime_ext_mat(kh,norder,h_bd1,src_info1);
+        D1  = dlp_ext_mat(kh,norder,h_bd1,src_info1);
         Der1 = specdiffmat(nout,src_info1)*rsc1;        
         T1 = Der1 * S1 * Der1  + kh^2 * (bsxfun(@times,bsxfun(@times,(dys1./ds1)',S1),dys1./ds1) + ...
             bsxfun(@times,bsxfun(@times,(dxs1./ds1)',S1),dxs1./ds1));
@@ -200,7 +207,8 @@ for ik = 1 : length(khv)
         umeas1(ik,iup).data = (D1_tgt + 1i * eta * S1_tgt)*pot1;
         
         % delta shape              
-        t_h = tt';
+%         t_h = tt';
+        t_h = t_bd*2*pi/L;
         h_t  = (var_up(1)+cos(bsxfun(@times,t_h',1:N_bd))*var_up(2:N_bd+1)'+...
             sin(bsxfun(@times,t_h',1:N_bd))*var_up(N_bd+2:end)')';             
         
