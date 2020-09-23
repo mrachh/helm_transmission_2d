@@ -4,8 +4,8 @@ clear
 %bounday
 N_bd             = 3;
 coefs_bd         = zeros(1,2*N_bd+1);
-coefs_bd(1)      = 3.;
-coefs_bd(N_bd+1) = 0.;
+coefs_bd(1)      = 1.;
+coefs_bd(N_bd+1) = 0.3;
 
 %incident data frequency
 khv    = 3;
@@ -97,9 +97,9 @@ for ik = 1 : length(khv)
     %remember to rescale
     norder = 16;
     rsc = 2*pi/L;
-    S  = slp_mat(kh,norder,h_bd,src_info)*rsc;
-    Sp = sprime_ext_mat(kh,norder,h_bd,src_info)*rsc;
-    D  = dlp_ext_mat(kh,norder,h_bd,src_info)*rsc;
+    S  = slp_mat(kh,norder,h_bd,src_info);%*rsc;
+    Sp = sprime_ext_mat(kh,norder,h_bd,src_info);%*rsc;
+    D  = dlp_ext_mat(kh,norder,h_bd,src_info);%*rsc;
     Der = specdiffmat(n_bd,src_info)*rsc;    
     T = Der * S * Der  + kh^2 * (bsxfun(@times,bsxfun(@times,(dys./ds)',S),dys./ds) + ...
         bsxfun(@times,bsxfun(@times,(dxs./ds)',S),dxs./ds));
@@ -175,9 +175,9 @@ for ik = 1 : length(khv)
         %generating operators
         norder = 16;
         rsc1 = 2*pi/L1;
-        S1  = slp_mat(kh,norder,h_bd1,src_info1)*rsc1;
-        Sp1 = sprime_ext_mat(kh,norder,h_bd1,src_info1)*rsc1;
-        D1  = dlp_ext_mat(kh,norder,h_bd1,src_info1)*rsc1;
+        S1  = slp_mat(kh,norder,h_bd1,src_info1);%*rsc1;
+        Sp1 = sprime_ext_mat(kh,norder,h_bd1,src_info1);%*rsc1;
+        D1  = dlp_ext_mat(kh,norder,h_bd1,src_info1);%*rsc1;
         Der1 = specdiffmat(nout,src_info1)*rsc1;        
         T1 = Der1 * S1 * Der1  + kh^2 * (bsxfun(@times,bsxfun(@times,(dys1./ds1)',S1),dys1./ds1) + ...
             bsxfun(@times,bsxfun(@times,(dxs1./ds1)',S1),dxs1./ds1));
@@ -200,7 +200,6 @@ for ik = 1 : length(khv)
         umeas1(ik,iup).data = (D1_tgt + 1i * eta * S1_tgt)*pot1;
         
         % delta shape              
-%         t_h  = 2*pi/L*t_bd;
         t_h = tt';
         h_t  = (var_up(1)+cos(bsxfun(@times,t_h',1:N_bd))*var_up(2:N_bd+1)'+...
             sin(bsxfun(@times,t_h',1:N_bd))*var_up(N_bd+2:end)')';             
