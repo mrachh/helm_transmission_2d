@@ -5,7 +5,7 @@ clear
 N_bd             = 3;
 coefs_bd         = zeros(1,2*N_bd+1);
 coefs_bd(1)      = 3.;
-coefs_bd(N_bd+1) = 0.1;
+coefs_bd(N_bd+1) = 0.;
 
 %incident data frequency
 khv    = 3;
@@ -94,12 +94,13 @@ for ik = 1 : length(khv)
     src_info = srcout;    
 
     %generating operators
+    %remember to rescale
     norder = 16;
-    S  = slp_mat(kh,norder,h_bd,src_info);
-    Sp = sprime_ext_mat(kh,norder,h_bd,src_info);
-    D  = dlp_ext_mat(kh,norder,h_bd,src_info);
-    Der = specdiffmat(n_bd,src_info);
-    Der = diag(2*pi/L)*Der;
+    rsc = 2*pi/L;
+    S  = slp_mat(kh,norder,h_bd,src_info)*rsc;
+    Sp = sprime_ext_mat(kh,norder,h_bd,src_info)*rsc;
+    D  = dlp_ext_mat(kh,norder,h_bd,src_info)*rsc;
+    Der = specdiffmat(n_bd,src_info)*rsc;    
     T = Der * S * Der  + kh^2 * (bsxfun(@times,bsxfun(@times,(dys./ds)',S),dys./ds) + ...
         bsxfun(@times,bsxfun(@times,(dxs./ds)',S),dxs./ds));
 
@@ -151,6 +152,7 @@ for ik = 1 : length(khv)
         
         %generating new domain        
         [srcout,hout,Lout,~,~] = resample_curve(src_info,L,N_bd,var_up',n_bd);                
+        L1    = Lout;
         t_bd1 = 0:hout:(Lout-hout);
         h_bd1 = hout;
         xs1  = srcout(1,:);
@@ -172,11 +174,11 @@ for ik = 1 : length(khv)
     
         %generating operators
         norder = 16;
-        S1  = slp_mat(kh,norder,h_bd1,src_info1);
-        Sp1 = sprime_ext_mat(kh,norder,h_bd1,src_info1);
-        D1  = dlp_ext_mat(kh,norder,h_bd1,src_info1);
-        Der1 = specdiffmat(nout,src_info1);
-        Der1 = 2*pi/Lout*Der1;
+        rsc1 = 2*pi/L1;
+        S1  = slp_mat(kh,norder,h_bd1,src_info1)*rsc1;
+        Sp1 = sprime_ext_mat(kh,norder,h_bd1,src_info1)*rsc1;
+        D1  = dlp_ext_mat(kh,norder,h_bd1,src_info1)*rsc1;
+        Der1 = specdiffmat(nout,src_info1)*rsc1;        
         T1 = Der1 * S1 * Der1  + kh^2 * (bsxfun(@times,bsxfun(@times,(dys1./ds1)',S1),dys1./ds1) + ...
             bsxfun(@times,bsxfun(@times,(dxs1./ds1)',S1),dxs1./ds1));
         
