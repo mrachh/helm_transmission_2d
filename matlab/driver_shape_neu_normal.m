@@ -5,7 +5,7 @@ addpath('../kress')
 addpath('./src')
 
 %bounday
-N_bd             = 5;
+N_bd             = 4;
 coefs_bd         = zeros(1,2*N_bd+1);
 coefs_bd(1)      = 1.;
 coefs_bd(N_bd+1) = 0.3;
@@ -30,19 +30,19 @@ for ik = 1 : length(khv)
     
     %target_points
     r_tgt = 10;
-    n_tgt = 100;
+    n_tgt = 5;
     t_tgt = 0:2*pi/n_tgt:2*pi-2*pi/n_tgt;
     x_t   = r_tgt * cos(t_tgt);
     y_t   = r_tgt * sin(t_tgt);    
     tgt   = [ x_t; y_t];
          
-    %generating the object
+    %generating the boundary
     n_bd  = ceil(32*kh);
     if (n_bd < 500)
         n_bd = 500;
     end
     t_bd  = 0:2*pi/n_bd:2*pi-2*pi/n_bd;
-    h_bd  = 2*pi/n_bd;    
+    h_bd     = 2*pi/n_bd;
     c_t   = cos(t_bd);
     s_t   = sin(t_bd);
     p_t   = (coefs_bd(1)+cos(bsxfun(@times,t_bd',1:N_bd))*coefs_bd(2:N_bd+1)'+...
@@ -73,6 +73,7 @@ for ik = 1 : length(khv)
     src_info(3,:) = dys./ds;
     src_info(4,:) = -dxs./ds;
     src_info(5,:) = ds;    
+    src_info(6,:) = H;
     src_old = src_info;
     [srcout,hout,Lout,~,tt] = resample_curve(src_info,L,N_bd,var_up');   
     n_bd = size(srcout,2);
@@ -85,6 +86,7 @@ for ik = 1 : length(khv)
     ds   = srcout(5,:);
     dxs  = -srcout(4,:).*srcout(5,:);
     dys  = srcout(3,:).*srcout(5,:);    
+    H    = srcout(6,:);
     
     %setting up the bdry for the operators
     src = zeros(4,n_bd);
@@ -92,12 +94,12 @@ for ik = 1 : length(khv)
     src(2,:) = ys;
     src(3,:) = dxs;
     src(4,:) = dys;
-        
+    
+    
     %setting up the bdry for the operators
     src_info = srcout;    
 
     %generating operators
-    %remember to rescale
     norder = 16;
     rsc = 2*pi/L;
     S  = slp_mat(kh,norder,h_bd,src_info);
@@ -111,51 +113,31 @@ for ik = 1 : length(khv)
     S_tgt = slmat_out(kh,h_bd,src,tgt);
     D_tgt = dlmat_out(kh,h_bd,src,tgt);    
     
+    
     %fw for lambda
     eta = kh;
-    Fw_mat = D + 1i * eta * S;    
+    Fw_mat = T + 1i* eta * Sp;       
     inv_Fw = inv(Fw_mat);    
     
     %bd_data
     uinc  = exp(1i *kh * (bsxfun(@times,xs',x_dir)+bsxfun(@times,ys',y_dir)));
-    duincdn = 1i* kh * (bsxfun(@times,dys',x_dir)-bsxfun(@times,dxs',y_dir)) .* uinc ./ repmat(ds',1,n_dir);
-    bd_data = -uinc;
+    duinc = 1i* kh * (bsxfun(@times,dys',x_dir)-bsxfun(@times,dxs',y_dir))./repmat(ds',1,n_dir) .* ...
+        uinc;
+    bd_data = -duinc;
     
     %calculating the measure
     pot = inv_Fw * bd_data;
     
     umeas(ik).data = (D_tgt + 1i * eta * S_tgt)*pot;
     ubd(ik).data   = (D + 1i * eta * S) * pot ;
-    dubd(ik).data  = (T + 1i * eta * Sp) * pot;
-    
-%     pots = S \ bd_data;
-%     potd = D \ bd_data;
-%     
-%     umeas_sing = S_tgt*pots;
-%     ubd_sing   = S*pots;
-%     dubd_sing  = Sp*pots;
-%     max(max(abs(umeas(ik).data-umeas_sing)))
-%     max(max(abs(ubd(ik).data-ubd_sing)))
-%     max(max(abs(dubd(ik).data-dubd_sing)))
-%     
-%     umeas_db = D_tgt*potd;
-%     ubd_db   = D*potd;
-%     dubd_db  = T*potd;
-%     max(max(abs(umeas(ik).data-umeas_db)))
-%     max(max(abs(ubd(ik).data-ubd_db)))
-%     max(max(abs(dubd(ik).data-dubd_db)))    
-%     
-%     max(max(abs(umeas_sing-umeas_db)))
-%     max(max(abs(ubd_sing-ubd_db)))
-%     max(max(abs(dubd_sing-dubd_db)))    
-%     pause
-    
+    dubd(ik).data  = (T + 1i * eta * Sp ) * pot;
+      
     % checking the domain update    
     for iup = 1: 2* N_bd+1
         %bd -> bd + delta
         var_up    = zeros(1,2*N_bd+1);
         delta = 1e-5;        
-        var_up(iup) = delta;           
+        var_up(iup) = delta;                   
         
         %generating new domain        
         [srcout,hout,Lout,~,~] = resample_curve(src_info,L,N_bd,var_up');                
@@ -167,6 +149,7 @@ for ik = 1 : length(khv)
         dxs1 = -srcout(4,:) .* srcout(5,:);
         dys1 = srcout(3,:) .* srcout(5,:);
         ds1  = srcout(5,:);  
+        H1   = srcout(6,:);
         
         %setting up the bdry for the operators
         nout = size(srcout,2);        
@@ -188,46 +171,59 @@ for ik = 1 : length(khv)
         Der1 = specdiffmat(nout,src_info1)*rsc1;        
         T1 = Der1 * S1 * Der1  + kh^2 * (bsxfun(@times,bsxfun(@times,(dys1./ds1)',S1),dys1./ds1) + ...
             bsxfun(@times,bsxfun(@times,(dxs1./ds1)',S1),dxs1./ds1));
-        
+
         %forward operator
         eta    = kh;    
-        Fw_mat1 = D1 + 1i * eta * S1;
+        Fw_mat1 = T1 + 1i* eta * Sp1;
         inv_Fw1 = inv(Fw_mat1);
 
         %boundary data for new domain
         uinc  = exp(1i *kh * (bsxfun(@times,xs1',x_dir)+bsxfun(@times,ys1',y_dir)));
-        bd_data1 = -uinc;
+        duinc = 1i* kh * (bsxfun(@times,dys1',x_dir)-bsxfun(@times,dxs1',y_dir))./repmat(ds1',1,n_dir) .* ...
+            exp(1i *kh * (bsxfun(@times,xs1',x_dir)+bsxfun(@times,ys1',y_dir)));
+        bd_data1 = -duinc;
         
         %calculating scattered field at target
         S1_tgt = slmat_out(kh,h_bd1,src1,tgt);
         D1_tgt = dlmat_out(kh,h_bd1,src1,tgt);    
         
         %measured data
-        pot1 = inv_Fw1 * bd_data1;
-        umeas1(ik,iup).data = (D1_tgt + 1i * eta * S1_tgt)*pot1;
+        pot = inv_Fw1 * bd_data1;
+        umeas1(ik,iup).data = (D1_tgt + 1i * eta * S1_tgt)*pot;
         
-        % delta shape              
+        % delta shape
         t_h = t_bd*2*pi/L;
-        h_t  = (var_up(1)+cos(bsxfun(@times,t_h',1:N_bd))*var_up(2:N_bd+1)'+...
-            sin(bsxfun(@times,t_h',1:N_bd))*var_up(N_bd+2:end)')';             
-        
+        h_t   = (var_up(1)+cos(bsxfun(@times,t_h',1:N_bd))*var_up(2:N_bd+1)'+...
+            sin(bsxfun(@times,t_h',1:N_bd))*var_up(N_bd+2:end)')';
+%         dh_t  = 2*pi/L*(bsxfun(@times,(1:N_bd)',-sin(bsxfun(@times,(1:N_bd)',t_h)))'*var_up(2:N_bd+1)' + ...
+%             bsxfun(@times,(1:N_bd)',cos(bsxfun(@times,(1:N_bd)',t_h)))'*var_up(N_bd+2:end)')';        
+%         max(abs(dh_t'-Der*h_t'))
+
+
         % right hand side        
         uinc    = exp(1i *kh * (bsxfun(@times,xs',x_dir)+bsxfun(@times,ys',y_dir)));
         duincdn = 1i* kh * (bsxfun(@times,dys',x_dir)-bsxfun(@times,dxs',y_dir)) .* uinc ./ repmat(ds',1,n_dir);
         u      = ubd(ik).data + uinc;
-        dudn   = dubd(ik).data + duincdn;        
-        
+        dudn   = dubd(ik).data + duincdn;
+        du     = Der*u;
+
         h_nu = repmat(h_t', 1, n_dir );
+                        
+        bd_data_delta1 = kh^2 * h_nu .* u;
         
-        bd_data_delta3 = -h_nu .* dudn  ;
+        bd_data_delta2 = Der*(h_nu.*du);
         
-        bd_data_delta = bd_data_delta3;
+%         bd2_data = repmat(dh_t',1,n_dir) .* du + h_nu .* (Der*du);
+%         max(abs(bd_data_delta2-bd2_data))
+%         bd_data_delta2 = bd2_data;
+        
+        bd_data_delta = bd_data_delta1 + bd_data_delta2;
         
         % finding potential
-        poth = inv_Fw * bd_data_delta;
+        pot = inv_Fw * bd_data_delta;
         
         % measure delta
-        umeas_delta(ik).data = (D_tgt + 1i * eta * S_tgt)*poth;
+        umeas_delta(ik).data = (D_tgt + 1i * eta * S_tgt)*pot;
         
         fprintf('Difference for mode %d is %d\n', iup, max(max(abs(umeas(ik).data+umeas_delta(ik).data-umeas1(ik,iup).data))))
     end
