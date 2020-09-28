@@ -12,11 +12,11 @@ coefs_bd(N_bd+1) = 0.3;
 
 %incident field frequency
 dk    = 0.5;
-n_kh  = 70;
+n_kh  = 40;
 khv   = 1:dk:n_kh*dk;
 
 % incidence directions
-n_dir = 16;
+n_dir = 32;
 t_dir = 0:2*pi/n_dir:2*pi-2*pi/n_dir;
 x_dir = cos(t_dir);
 y_dir = sin(t_dir);
@@ -32,7 +32,7 @@ tgt   = [ x_t; y_t];
 
 %choose to add noise
 ifnoise   = 1;
-noise_lvl = 0.02;
+noise_lvl = 0.01;
 
 %genrating 
 for ik = 1 : length(khv)    
@@ -144,7 +144,8 @@ end
 
 %filter parameters
 iffilter = 1; 
-sigma = 0.1;
+sigma = 0.2;%works for 5
+% sigma = 0.3;
 
 %RLA with Newton method
 for ik = 1 : length(khv)
@@ -159,9 +160,9 @@ for ik = 1 : length(khv)
     it_newton   = 1;
     eps_step    = 1e-4;
     eps_res     = 1e-2;
-    max_it      = 40;
+    max_it      = 50;
     rhs_old     = 1e16;
-    alpha       = .5;
+%     alpha       = .5;
     
     while flag_newton
         
@@ -330,7 +331,24 @@ for ik = 1 : length(khv)
         end
                 
         %update domain
-        [srcout,hout,Lout,~,tt] = resample_curve(src_info,L,N_var,alpha*delta',n_bd);   
+        src_update = src_info;
+        alpha      = 2;
+        while 1
+            fprintf('alpha=%d\n',alpha)                
+            alpha = alpha/2;            
+            [srcout,~,Lout,~,~] = resample_curve(src_info,L,N_var,alpha*delta',n_bd);
+            if issimple(srcout(1,:),srcout(2,:))                
+                fprintf('alpha=%d\n',alpha)                
+                break;
+            end
+            if alpha <.1
+                alpha=0;
+                fprintf('alpha=%d\n',alpha)                
+                break;
+                srcout = src_info;
+            end
+        end                       
+%         [srcout,hout,Lout,~,tt] = resample_curve(src_info,L,N_var,alpha*delta',n_bd);   
         src_info = srcout;
         L_old    = L;
         L        = Lout;
