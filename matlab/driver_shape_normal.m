@@ -20,7 +20,7 @@ coefs_imp(1)   = 0.2;
 khv    = 3;%:dk:n_kh*dk;
 
 % incidence directions
-n_dir = 1;
+n_dir = 5;
 t_dir = 0:2*pi/n_dir:2*pi-2*pi/n_dir;
 x_dir = cos(t_dir);
 y_dir = sin(t_dir);

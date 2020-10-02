@@ -166,12 +166,12 @@ for ik = 1 : length(khv)
     fprintf('Wavenumber=%d\n',kh)
     
     %target_points
-    r_tgt = 10;
-    n_tgt = 5;
-    t_tgt = 0:2*pi/n_tgt:2*pi-2*pi/n_tgt;
-    x_t   = r_tgt * cos(t_tgt);
-    y_t   = r_tgt * sin(t_tgt);    
-    tgt   = [ x_t; y_t];
+%     r_tgt = 10;
+%     n_tgt = 5;
+%     t_tgt = 0:2*pi/n_tgt:2*pi-2*pi/n_tgt;
+%     x_t   = r_tgt * cos(t_tgt);
+%     y_t   = r_tgt * sin(t_tgt);    
+%     tgt   = [ x_t; y_t];
     
     if ik == 1
         %set initial guess for domain       
