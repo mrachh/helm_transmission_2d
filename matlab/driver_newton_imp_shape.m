@@ -1,6 +1,8 @@
 %driver for inverse shape
 clear
 
+addpath('./src')
+
 %set up bounday
 N_bd          = 5;
 coefs_bd      = zeros(1,2*N_bd+1);
@@ -17,7 +19,7 @@ coefs_bd(N_bd+1) = 0.3;
 
 %incident field frequency
 dk    = 0.25;
-n_kh  = 200;
+n_kh  = 50;
 khv   = 1:dk:n_kh*dk;
 
 % incidence directions
@@ -517,3 +519,5 @@ for ik=1:length(khv)
     pause(1);
     
 end
+
+save('test_imp_shape_ndk10.out')
