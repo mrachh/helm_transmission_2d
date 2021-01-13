@@ -114,7 +114,7 @@ mex:  $(STATICLIB)
 #
 
 #examples: $(OBJS) $(TOBJS) examples/ext_dir examples/trans examples/curve examples/circ
-examples: $(OBJS) $(TOBJS) examples/circ
+examples: $(OBJS) $(TOBJS) examples/curve
 #	time -p ./examples/int2-dir
 #	time -p ./examples/int2-trans
 	time -p ./examples/int2-curve
