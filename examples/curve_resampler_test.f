@@ -3,6 +3,7 @@
       real *8, allocatable :: srcinfo(:,:)
       real *8, allocatable :: ts(:),xver(:),yver(:)
       real *8, allocatable :: ts0(:),wts0(:)
+      real *8, allocatable :: work(:)
 
       call prini(6,13)
 
@@ -51,6 +52,8 @@ cc      enddo
       print *, "lsave=",lsave
       print *, "lused=",lused
 
+      print *, "Here"
+
 
 
       allocate(wsave(lsave))
@@ -66,6 +69,8 @@ cc      enddo
       call prin2('curvelen=*',curvelen,1)
       print *, "curvelen=",curvelen
       call prin2('curvature=*',srcinfo(6,1:nout),24)
+
+
       
       erra = 0
       ra = 0
@@ -89,6 +94,7 @@ cc      enddo
       do i=1,nout
         write(87,*) srcinfo(1,i),srcinfo(2,i)
       enddo
+
 c
 c  test curvature here
 c
@@ -132,12 +138,6 @@ c
 
       erra = abs(r2-r1)
       call prin2('error=*',erra,1)
-
-      lw = 10000
-      allocate(work(lw))
-
-      call curve
-      
 
 
       

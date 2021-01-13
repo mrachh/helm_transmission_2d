@@ -127,7 +127,7 @@ examples/trans:
 	$(FC) $(FFLAGS) examples/trans_solver.f $(OBJS) -o examples/int2-trans -lopenblas $(LDFLAGS)
 
 examples/curve:
-	$(FC) $(FFLAGS) examples/test_funcurv_fft.f $(OBJS) $(TOBJS) -o examples/int2-curve 
+	$(FC) $(FFLAGS) examples/curve_resampler_test.f $(OBJS) $(TOBJS) -o examples/int2-curve 
 
 examples/circ:
 	$(FC) $(FFLAGS) examples/circ_test2.f $(OBJS) $(TOBJS) -o examples/int2-circ  -lopenblas $(LDFLAGS)
