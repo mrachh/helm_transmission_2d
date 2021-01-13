@@ -15,7 +15,7 @@ FC=gfortran
 FFLAGS= -fPIC -O3 -march=native -funroll-loops -std=legacy -w 
 CFLAGS= -std=c99 
 CFLAGS+= $(FFLAGS)
-LDFLAGS="-L/usr/local/opt/openblas/lib"
+#LDFLAGS="-L/usr/local/opt/openblas/lib"
 CPPFLAGS="-I/usr/local/opt/openblas/include" 
 
 CLINK = -lgfortran -lm -ldl
@@ -46,7 +46,7 @@ OBJS = src/hank103.o src/prini.o src/helm_kernels.o  \
 	src/formsysmatbac.o src/kern_mats.o src/lap_kernels.o \
 	src/durdec.o src/corrand4.o src/dumb_conres.o \
 	src/legeexps.o src/curve_filtering2.o src/curve_resampler.o \
-	src/dfft.o
+	src/dfft.o src/cdjseval2d.o src/h2dcommon.o
 
 TOBJS = src/hkrand.o src/dlaran.o
 
@@ -113,10 +113,12 @@ mex:  $(STATICLIB)
 ##  examples
 #
 
-examples: $(OBJS) $(TOBJS) examples/ext_dir examples/trans examples/curve 
+#examples: $(OBJS) $(TOBJS) examples/ext_dir examples/trans examples/curve examples/circ
+examples: $(OBJS) $(TOBJS) examples/circ
 #	time -p ./examples/int2-dir
 #	time -p ./examples/int2-trans
 	time -p ./examples/int2-curve
+#	time -p ./examples/int2-circ
 
 examples/ext_dir:
 	$(FC) $(FFLAGS) examples/ext_dir_solver.f $(OBJS) -o examples/int2-dir -lopenblas $(LDFLAGS) 
@@ -127,6 +129,8 @@ examples/trans:
 examples/curve:
 	$(FC) $(FFLAGS) examples/test_funcurv_fft.f $(OBJS) $(TOBJS) -o examples/int2-curve 
 
+examples/circ:
+	$(FC) $(FFLAGS) examples/circ_test2.f $(OBJS) $(TOBJS) -o examples/int2-circ  -lopenblas $(LDFLAGS)
 
 clean: objclean
 	rm -f examples/ext_dir_solver examples/trans_solver
