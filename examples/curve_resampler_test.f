@@ -12,6 +12,9 @@
       allocate(xy(2,n))
 
       open(unit=87,file='bunny10out')
+c
+c   input vertices
+c
       do i=1,n
         read(87,*) xtmp,ytmp
         x0(i) = xtmp
@@ -28,8 +31,13 @@ cc      enddo
 
       
 
-
+c
+c  nb = band limit
+c
       nb = 200
+c
+c  interpolation tolerance
+c
       eps = 1.0d-9
 
       ierm = 0
