@@ -46,7 +46,7 @@ OBJS = src/hank103.o src/prini.o src/helm_kernels.o  \
 	src/formsysmatbac.o src/kern_mats.o src/lap_kernels.o \
 	src/durdec.o src/corrand4.o src/dumb_conres.o \
 	src/legeexps.o src/curve_filtering2.o src/curve_resampler.o \
-	src/dfft.o src/cdjseval2d.o src/h2dcommon.o
+	src/dfft.o src/cdjseval2d.o src/h2dcommon.o src/curve_filtering2_der2.o
 
 TOBJS = src/hkrand.o src/dlaran.o
 
@@ -127,7 +127,7 @@ examples/trans:
 	$(FC) $(FFLAGS) examples/trans_solver.f $(OBJS) -o examples/int2-trans -lopenblas $(LDFLAGS)
 
 examples/curve:
-	$(FC) $(FFLAGS) examples/curve_resampler_test.f $(OBJS) $(TOBJS) -o examples/int2-curve 
+	$(FC) $(FFLAGS) examples/curve_resampler_test_der2.f $(OBJS) $(TOBJS) -o examples/int2-curve 
 
 examples/circ:
 	$(FC) $(FFLAGS) examples/circ_test2.f $(OBJS) $(TOBJS) -o examples/int2-circ  -lopenblas $(LDFLAGS)
