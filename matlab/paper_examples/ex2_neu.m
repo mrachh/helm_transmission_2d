@@ -6,7 +6,7 @@ addpath('../')
 
 %incident field frequency
 dk    = 0.25;
-n_kh  = 77;
+n_kh  = 5;
 khv   = 1:dk:(1+n_kh*dk);
 
 % incidence directions
@@ -23,6 +23,14 @@ t_tgt = 0:2*pi/n_tgt:2*pi-2*pi/n_tgt;
 x_t   = r_tgt * cos(t_tgt);
 y_t   = r_tgt * sin(t_tgt);    
 tgt   = [ x_t; y_t];
+
+
+% Newton stopping criterion
+eps_step    = 1e-3;
+eps_res     = 1e-3;
+max_it      = 200;
+
+bd_inv_refs = cell(max_it,n_kh);
 
 %choose to add noise
 ifnoise   = 0;
@@ -58,6 +66,17 @@ if generate
     dys   = dp_t .* s_t + p_t .* c_t;
     ds    = sqrt(dxs.^2 + dys.^2);
     Lplane    = length(ds)*h_bd;
+    d2p_t = (bsxfun(@times,((1:N_bd).*(1:N_bd))',-cos(bsxfun(@times,(1:N_bd)',t_bd)))'*coefs_bd(2:N_bd+1)' + ...
+                bsxfun(@times,((1:N_bd).*(1:N_bd))',-sin(bsxfun(@times,(1:N_bd)',t_bd)))'*coefs_bd(N_bd+2:end)')';	
+    d2xs = d2p_t .* c_t + 2 * dp_t .* (-s_t) + p_t .* (-c_t);
+    d2ys = d2p_t .* s_t + 2 * dp_t .* c_t + p_t .* (-s_t);
+    ds   = sqrt(dxs.^2 + dys.^2);
+	H    = ( dxs .* d2ys - dys .* d2xs )  ./ ( ds.^3 );
+    bd_ref = struct('t_bd',t_bd,'h_bd',h_bd,'xs',xs,'ys',ys,'dxs',dxs,...
+        'dys',dys,'ds','ds','Lplane',Lplane,'d2xs',d2xs,'d2ys',d2ys,'H',H,...
+        'n_bd',n_bd);
+    
+    
 
 
     %genrating 
@@ -97,6 +116,7 @@ if generate
         ds   = sqrt(dxs.^2 + dys.^2);
 	    H    = ( dxs .* d2ys - dys .* d2xs )  ./ ( ds.^3 );
         L    = length(ds)*h_bd; 
+        
 
         %reparametrization
         var_up    = zeros(1,2*N_bd+1);    
@@ -183,11 +203,18 @@ if generate
         utest = (S_tgt + 1i * eta * D_tgt*Sik)*sol_a;
         errs(ik) = norm(utest-uex)/norm(uex);
         fprintf('error=%d\n',errs(ik));
+        if mod(ik,15)
+            save('./neu-example-data/data_k20.mat','umeas','errs','t_lambda',...
+            'lambda_imp_orig',...
+            'N_bd','coefs_bd','khv','bd_ref');
+        end
 
         %umeas(ik).data = (D_tgt + 1i * eta * S_tgt)*pot;
 
     end
-    save('./neu-example-data/data_k20.mat')
+    save('./neu-example-data/data_k20.mat','umeas','errs','t_lambda',...
+      'lambda_imp_orig',...
+      'N_bd','coefs_bd','khv','bd_ref');
     return
 else
    load('./neu-example-data/data_k20.mat')
@@ -204,7 +231,7 @@ end
 %Inverse problem
 ik=1;
 
-while ik <= 77
+while ik <= n_kh
     
     %incident data
     kh = khv(ik);
@@ -214,22 +241,18 @@ while ik <= 77
     %newton variables
     flag_newton = 1;
     it_newton   = 1;
-    eps_step    = 1e-3;
-    eps_res     = 1e-3;
-    max_it      = 200;
+    
     
     %set up initial domain        
-    if ik == 1
-        if (n_bd < 300)
-            n_bd = 300;
-        end
+    if ik == 1 && it_newton == 1
+        n_bd = 300;
         if mod(n_bd,2)
             n_bd = n_bd+1;
         end        
         t_bd  = 0:2*pi/n_bd:2*pi-2*pi/n_bd;
         h_bd     = 2*pi/n_bd;
-        c_t   = cos(t_bd+pi);
-        s_t   = sin(t_bd+pi);
+        c_t   = cos(t_bd);
+        s_t   = sin(t_bd);
         p_t   = 1;
         dp_t  = 0;
         d2p_t = 0;
@@ -358,7 +381,7 @@ while ik <= 77
      rhs      = umeas(ik).data-uscat;
      rhs      = rhs(:);
      rhs_old = rhs;
-
+     
      while flag_newton
         
         if it_newton == 1
@@ -448,9 +471,9 @@ while ik <= 77
         %update impedance
         var_imp_old = var_imp;
         var_imp(1) = var_imp(1)+delta_imp(1);
-	if N_imp>1
-	    var_imp(2:N_imp+1) = var_imp(2:N_imp+1)+delta_imp(2:N_imp+1);
-	    var_imp(N_imp_tot+2:N_imp_tot+1+N_imp) = var_imp(N_imp_tot+2:N_imp_tot+1+N_imp)+delta_imp(N_imp+2:end);
+	    if N_imp>1
+	      var_imp(2:N_imp+1) = var_imp(2:N_imp+1)+delta_imp(2:N_imp+1);
+	      var_imp(N_imp_tot+2:N_imp_tot+1+N_imp) = var_imp(N_imp_tot+2:N_imp_tot+1+N_imp)+delta_imp(N_imp+2:end);
         end
 
 	%update domain
@@ -466,7 +489,7 @@ while ik <= 77
             [srcout,~,Lout,~,~] = resample_curve(src_info,L_info,N_var,delta_var',n_bd);
 
             if (issimple(srcout(1,:),srcout(2,:)))
-		fprintf('Passed simple test with sigma=%d at iteration =%d\n',sigma_bd, it_filtering)                           
+		        fprintf('Passed simple test with sigma=%d at iteration =%d\n',sigma_bd, it_filtering)                           
                 L_old    = L;
                 L        = Lout;
                 xs  = srcout(1,:);
@@ -478,16 +501,16 @@ while ik <= 77
                 Der = specdiffmat(n_bd,srcout)*rsc;
                 H = ( dxs .* (Der*dys')' - dys .* (Der*dxs')' )  ./ ( ds.^3 );
                 Hhat = fft(H);
-                NH = floor(3*kh);
+                NH = floor(N_var);
                 Hhat_bounded = [ Hhat(1:NH+1) Hhat(end-NH+1:end)];        
                 filtering(ik).value(it_newton).nh3(it_filtering) = norm(Hhat_bounded)/norm(Hhat);
                 filtering(ik).sigma(it_newton) = sigma_bd;
                 ratio_k = 1 - norm(Hhat_bounded)/norm(Hhat);
-		fprintf('Ratio test=%d\n',ratio_k)
+		        fprintf('Ratio test=%d\n',ratio_k)
                 if ratio_k<1*10^-3
                     fprintf('Passed ratio test with sigma=%d at iteration =%d with ratio=%d\n',sigma_bd, it_filtering,ratio_k)
                     src_info = srcout; 
-		    L = Lout;
+		            L = Lout;
                     flag_domain_step = 0;
                     break;
                 else
@@ -619,33 +642,49 @@ while ik <= 77
         %right hand side
         rhs= umeas(ik).data-uscat;
         rhs = rhs(:);
+        
+        bd_inv_ref0 = struct('t_bd',t_bd,'h_bd',h_bd,'xs',xs,'ys',ys,'dxs',dxs,...
+        'dys',dys,'L',L,'H',H,'n_bd',n_bd,'rhs',rhs,'delta_var',delta_var,...
+        'delta_imp',delta_imp,'t_lambda',t_lambda,'lambda_imp',lambda_imp,...
+        'sigma_bd',sigma_bd,'it_filtering',it_filtering,'fret_imp_cond',...
+        cond(DFw_imp),'fret_dom_cond',cond(DFw_var),'fret_cond',cond(Minv),...
+        'rank_imp',rank(DFw_imp,1e-10),'rank_dom',rank(DFw_var,1e-10),...
+        'rank_fret',rank(Minv,1e-10));
+        bd_inv_refs{it_newton,ik} = bd_inv_ref0; 
 
+        
+        
+        iesc = 0;
         %stopping parameter
         if ~flag_domain_step
 
             fprintf('Step impedance= %d\n',norm(var_imp-var_imp_old)/norm(var_imp))
-	    fprintf('Step domain=%d\n',norm(delta_var))
+	        fprintf('Step domain=%d\n',norm(delta_var))
         
             %stopping parameter
             if (norm(var_imp-var_imp_old)/norm(var_imp) < eps_step) %&& (norm(delta_var) < eps_step)
               flag_newton = 0;
+              iesc = 1;
               fprintf('Step too small!\n')  
             end
         
             if it_newton > max_it
               flag_newton = 0;
+              iesc = 2;
               fprintf('Reached max iteration!\n')            
             end
         
             if norm(rhs)/norm(umeas(ik).data) < eps_res
                flag_newton = 0;
+               iesc = 3;
                fprintf('RHS too small!\n')
             end
         
             if norm(rhs_old)<norm(rhs)                
                 var_imp  = var_imp_old;
                 src_info = src_info_old;
-		L        = L_info;
+		        L  = L_info;
+                iesc = 4;
                 fprintf('RHS increasing! %d -> %d\n',norm(rhs_old)/norm(umeas(ik).data),norm(rhs)/norm(umeas(ik).data))
                 break;
             end
@@ -657,7 +696,8 @@ while ik <= 77
         else
             var_imp  = var_imp_old;
             src_info = src_info_old;
-            L        = L_info;	    
+            L        = L_info;
+            iesc = 5;
             break;
         end
     end
@@ -670,18 +710,21 @@ while ik <= 77
     bd_sols(ik).rny = src_info(4,:);
     bd_sols(ik).ds  = src_info(5,:);
     bd_sols(ik).H   = src_info(6,:);
+    iesc_flag(ik) = iesc;
+    it_newtons(ik) = it_newton;
+    rhs_mags(ik) = norm(rhs)/norm(umeas(ik).data);
     ik = ik + 1;
     
     if mod(ik,15) % ~mod(kh,10)
       disp("ik="+ik)
-      save('neu-example-data/sol_3kd05ki_impnocor_n000_damp.mat')
-      save('neu-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat','bd_sols','lambda_vecs','khv')
+      save('neu-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat',...
+      'bd_sols','lambda_vecs','khv','iesc_flag','it_newtons','rhs_mags',...
+      'bd_inv_refs')
     end
 
 end
 disp("ik="+ik)
 
-save('neu-example-data/sol_3kd05ki_impnocor_n000_damp.mat')
-save('neu-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat','bd_sols','lambda_vecs','khv')
-exit
-
+save('neu-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat',...
+      'bd_sols','lambda_vecs','khv','iesc_flag','it_newtons','rhs_mags',...
+      'bd_inv_refs')
