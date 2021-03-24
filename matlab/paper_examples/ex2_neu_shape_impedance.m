@@ -6,8 +6,8 @@ addpath('../')
 
 %incident field frequency
 dk    = 0.25;
-n_kh  = 197;
-khv   = 1:dk:n_kh*dk;
+n_kh  = 77;
+khv   = 1:dk:(1+n_kh*dk);
 
 % incidence directions
 n_dir = 16;
@@ -29,12 +29,38 @@ ifnoise   = 0;
 noise_lvl = 0.02;
 
 %generating data
-load('data_plane_k50_nonoise_dir.mat')
-generate = 0;
+%sload('data_plane_k50_nonoise_dir.mat')
+generate = 1;
 
-if generate     
-    %set up bounday
-    load_image
+if generate 
+    %genrating    
+    N_bd          = 8;
+    coefs_bd      = zeros(1,2*N_bd+1);
+    coefs_bd(1)   = 1.;
+    coefs_bd(4)   = 0.2;
+    coefs_bd(5)   = 0.02;
+    coefs_bd(7)   = 0.1;
+    coefs_bd(9)   = 0.1;
+    n_bd = 1000;
+    if mod(n_bd,2)
+        n_bd = n_bd+1;
+    end
+    t_bd  = 0:2*pi/n_bd:2*pi-2*pi/n_bd;
+    h_bd     = 2*pi/n_bd;
+    c_t   = cos(t_bd);
+    s_t   = sin(t_bd);
+    p_t   = (coefs_bd(1)+cos(bsxfun(@times,t_bd',1:N_bd))*coefs_bd(2:N_bd+1)'+...
+        sin(bsxfun(@times,t_bd',1:N_bd))*coefs_bd(N_bd+2:end)')';
+    dp_t  = (bsxfun(@times,(1:N_bd)',-sin(bsxfun(@times,(1:N_bd)',t_bd)))'*coefs_bd(2:N_bd+1)' + ...
+        bsxfun(@times,(1:N_bd)',cos(bsxfun(@times,(1:N_bd)',t_bd)))'*coefs_bd(N_bd+2:end)')';
+    xs    = p_t .* c_t;
+    ys    = p_t .* s_t;
+    dxs   = dp_t .* c_t + p_t .* (-s_t);
+    dys   = dp_t .* s_t + p_t .* c_t;
+    ds    = sqrt(dxs.^2 + dys.^2);
+    Lplane    = length(ds)*h_bd;
+
+
     %genrating 
     for ik = 1 : length(khv)    
         %incident data
@@ -47,20 +73,32 @@ if generate
 
         %generating the boundary
         n_bd  = ceil(50*Nw);
-        if (n_bd < 300)
-            n_bd = 300;
+        if (n_bd < 600)
+            n_bd = 600;
         end
         if mod(n_bd,2)
             n_bd = n_bd+1;
         end
         t_bd  = 0:Lplane/n_bd:Lplane-Lplane/n_bd;    
-        xs    = fnval(t_bd,xplane);
-        ys    = fnval(t_bd,yplane);
-        dxs   = fnval(t_bd,dxplane);
-        dys   = fnval(t_bd,dyplane);
-        ds    = sqrt(dxs.^2 + dys.^2);
-        H     = ones(1,n_bd);
-        L     = Lplane;
+        h_bd  = 2*pi/n_bd;
+        c_t   = cos(t_bd);
+        s_t   = sin(t_bd);
+        p_t   = (coefs_bd(1)+cos(bsxfun(@times,t_bd',1:N_bd))*coefs_bd(2:N_bd+1)'+...
+                sin(bsxfun(@times,t_bd',1:N_bd))*coefs_bd(N_bd+2:end)')';
+        dp_t  = (bsxfun(@times,(1:N_bd)',-sin(bsxfun(@times,(1:N_bd)',t_bd)))'*coefs_bd(2:N_bd+1)' + ...
+                bsxfun(@times,(1:N_bd)',cos(bsxfun(@times,(1:N_bd)',t_bd)))'*coefs_bd(N_bd+2:end)')';
+	    d2p_t = (bsxfun(@times,((1:N_bd).*(1:N_bd))',-cos(bsxfun(@times,(1:N_bd)',t_bd)))'*coefs_bd(2:N_bd+1)' + ...
+                bsxfun(@times,((1:N_bd).*(1:N_bd))',-sin(bsxfun(@times,(1:N_bd)',t_bd)))'*coefs_bd(N_bd+2:end)')';	
+        xs   = p_t .* c_t;
+        ys   = p_t .* s_t;
+        dxs  = dp_t .* c_t + p_t .* (-s_t);
+        dys  = dp_t .* s_t + p_t .* c_t;
+	    d2xs = d2p_t .* c_t + 2 * dp_t .* (-s_t) + p_t .* (-c_t);
+        d2ys = d2p_t .* s_t + 2 * dp_t .* c_t + p_t .* (-s_t);
+        ds   = sqrt(dxs.^2 + dys.^2);
+	    H    = ( dxs .* d2ys - dys .* d2xs )  ./ ( ds.^3 );
+        L    = length(ds)*h_bd; 
+
         %reparametrization
         var_up    = zeros(1,2*N_bd+1);    
         src_info      = zeros(6,n_bd);
@@ -117,7 +155,7 @@ if generate
 
         %generating the impedance
         t_lambda = t_bd*2*pi/L;
-        lambda_imp_orig = lambda_imp_f(t_lambda);    
+        lambda_imp_orig = zeros(size(t_lambda));    
 
         %solving the system
         eta    = kh;    
@@ -136,12 +174,24 @@ if generate
         %calculating scattered field at target
         pot = inv_Fw * bd_data;    
         umeas(ik).data = (S_tgt + 1i * eta * D_tgt*Sik)*pot;
+        
+        % Analytic solution test to make sure correct data is generated
+        src0 = [0.01;-0.07];
+        uex = helm_c_p(kh,src0,tgt);
+        dudnin_a = helm_c_gn(kh,src0,src_info);
+        rhs_a = dudnin_a;
+        sol_a = inv_Fw * rhs_a;
+        utest = (S_tgt + 1i * eta * D_tgt*Sik)*sol_a;
+        errs(ik) = norm(utest-uex)/norm(uex);
+        fprintf('error=%d\n',errs(ik));
+
         %umeas(ik).data = (D_tgt + 1i * eta * S_tgt)*pot;
 
     end
-    save('./data_t70_k90_2.mat')
+    save('./neu-example-data/data_k50.mat')
+    return
 else
-   load('data_plane_k50_nonoise_dir.mat')
+   load('./neu-example-data/data_k50.mat')
 end
 
 if (ifnoise == 1)
