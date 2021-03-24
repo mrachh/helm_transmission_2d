@@ -29,8 +29,7 @@ ifnoise   = 0;
 noise_lvl = 0.02;
 
 %generating data
-%sload('data_plane_k50_nonoise_dir.mat')
-generate = 1;
+generate = 0;
 
 if generate 
     %genrating    
@@ -188,10 +187,10 @@ if generate
         %umeas(ik).data = (D_tgt + 1i * eta * S_tgt)*pot;
 
     end
-    save('./neu-example-data/data_k50.mat')
+    save('./neu-example-data/data_k20.mat')
     return
 else
-   load('./neu-example-data/data_k50.mat')
+   load('./neu-example-data/data_k20.mat')
 end
 
 if (ifnoise == 1)
@@ -205,7 +204,7 @@ end
 %Inverse problem
 ik=1;
 
-while ik <= 30
+while ik <= 77
     
     %incident data
     kh = khv(ik);
@@ -221,8 +220,8 @@ while ik <= 30
     
     %set up initial domain        
     if ik == 1
-        if (n_bd < 280)
-            n_bd = 280;
+        if (n_bd < 300)
+            n_bd = 300;
         end
         if mod(n_bd,2)
             n_bd = n_bd+1;
@@ -260,10 +259,10 @@ while ik <= 30
 
 
     %%%%%%%%%%%Impedance%%%%%%%%%%%%%%
-    if ik == 1
-	N_imp_tot  = 50;
-	var_imp    = zeros(1,2*N_imp_tot+1);
-        var_imp(1) = 0.5;
+    if ik == 1 && it_newton == 1
+	   N_imp_tot  = 50;
+	   var_imp    = zeros(1,2*N_imp_tot+1);
+       var_imp(1) = 0.5;
     end 
 
     %%%%%%%%%%%Shape%%%%%%%%%%%%%%
@@ -675,14 +674,14 @@ while ik <= 30
     
     if mod(ik,15) % ~mod(kh,10)
       disp("ik="+ik)
-      save('sol_plane_3kd05ki_impnocor_dir_damp_rep2.mat')
-      save('sol_plane_3kd05ki_impnocor_dir_damp_movie_rep2.mat','bd_sols','lambda_vecs','khv')
+      save('neu-example-data/sol_3kd05ki_impnocor_n000_damp.mat')
+      save('neu-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat','bd_sols','lambda_vecs','khv')
     end
 
 end
 disp("ik="+ik)
 
-save('sol_plane_3kd05ki_impnocor_dir_damp_rep2.mat')
-save('sol_plane_3kd05ki_impnocor_dir_damp_movie_rep2.mat','bd_sols','lambda_vecs','khv')
+save('neu-example-data/sol_3kd05ki_impnocor_n000_damp.mat')
+save('neu-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat','bd_sols','lambda_vecs','khv')
 exit
 
