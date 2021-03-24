@@ -6,8 +6,8 @@ addpath('../')
 
 %incident field frequency
 dk    = 0.25;
-n_kh  = 1;
-khv   = 1:dk:(1+n_kh*dk);
+n_kh  = 77;
+khv   = 1:dk:(1+(n_kh-1)*dk);
 
 % incidence directions
 n_dir = 16;
@@ -33,7 +33,7 @@ max_it      = 200;
 bd_inv_refs = cell(max_it,n_kh);
 
 %choose to add noise
-ifnoise   = 0;
+ifnoise   = 1;
 noise_lvl = 0.02;
 
 %generating data
@@ -212,6 +212,7 @@ if generate
     save('./dir-example-data/data_k20.mat','umeas','errs','t_lambda',...
       'lambda_imp_orig',...
       'N_bd','coefs_bd','khv','bd_ref');
+    exit;
     return
 else
    load('./dir-example-data/data_k20.mat')
@@ -714,7 +715,7 @@ while ik <= n_kh
     
     if mod(ik,15) % ~mod(kh,10)
       disp("ik="+ik)
-      save('dir-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat',...
+      save('dir-example-data/sol_3kd05ki_impnocor_n002_damp_movie.mat',...
       'bd_sols','lambda_vecs','khv','iesc_flag','it_newtons','rhs_mags',...
       'bd_inv_refs')
     end
@@ -722,6 +723,7 @@ while ik <= n_kh
 end
 disp("ik="+ik)
 
-save('dir-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat',...
+save('dir-example-data/sol_3kd05ki_impnocor_n002_damp_movie.mat',...
       'bd_sols','lambda_vecs','khv','iesc_flag','it_newtons','rhs_mags',...
       'bd_inv_refs')
+exit;

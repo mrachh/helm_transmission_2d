@@ -6,7 +6,7 @@ addpath('../')
 
 %incident field frequency
 dk    = 0.25;
-n_kh  = 5;
+n_kh  = 317;
 khv   = 1:dk:(1+(n_kh-1)*dk);
 
 % incidence directions
@@ -160,7 +160,7 @@ if generate
         errs(ik) = norm(utest-uex)/norm(uex);
         fprintf('error=%d\n',errs(ik));
         if mod(ik,15) 
-            save('./t20-example-data/data_k80.mat','umeas','errs','t_lambda',...
+            save('./t70-example-data/data_k80.mat','umeas','errs','t_lambda',...
             'lambda_imp_orig','khv');
             
         end
@@ -168,9 +168,9 @@ if generate
         %umeas(ik).data = (D_tgt + 1i * eta * S_tgt)*pot;
 
     end
-    save('./t20-example-data/data_k80.mat','umeas','errs','t_lambda',...
+    save('./t70-example-data/data_k80.mat','umeas','errs','t_lambda',...
       'lambda_imp_orig','khv');
-      
+    exit;  
     return
 else
    load('./t70-example-data/data_k80.mat')
@@ -684,3 +684,4 @@ disp("ik="+ik)
 save('t70-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat',...
       'bd_sols','lambda_vecs','khv','iesc_flag','it_newtons','rhs_mags',...
       'bd_inv_refs')
+exit;

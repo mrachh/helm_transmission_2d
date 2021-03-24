@@ -6,8 +6,8 @@ addpath('../')
 
 %incident field frequency
 dk    = 0.25;
-n_kh  = 5;
-khv   = 1:dk:(1+n_kh*dk);
+n_kh  = 317;
+khv   = 1:dk:(1+(n_kh-1)*dk);
 
 % incidence directions
 n_dir = 16;
@@ -170,7 +170,7 @@ if generate
     end
     save('./t20-example-data/data_k80.mat','umeas','errs','t_lambda',...
       'lambda_imp_orig','khv');
-      
+    exit;  
     return
 else
    load('./t20-example-data/data_k80.mat')
@@ -684,3 +684,5 @@ disp("ik="+ik)
 save('t20-example-data/sol_3kd05ki_impnocor_n000_damp_movie.mat',...
       'bd_sols','lambda_vecs','khv','iesc_flag','it_newtons','rhs_mags',...
       'bd_inv_refs')
+
+exit;
