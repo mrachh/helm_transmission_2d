@@ -57,7 +57,7 @@ ds  = sqrt(dxs.^2 + dys.^2);
 rnx = dys./ds;
 rny = -dxs./ds;
 
-plot(xs,ys);hold on; quiver(xs,ys,rnx,rny)
+%plot(xs,ys);hold on; quiver(xs,ys,rnx,rny)
 
 % save('plane.mat','xplane','yplane','dxplane','dyplane','Lplane')
 

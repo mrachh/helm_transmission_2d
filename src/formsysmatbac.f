@@ -268,7 +268,7 @@ c       carry out "punctured" trapezoidal rule and fill in matrix
 c       entries, skipping entries within nskip of the diagonal
 c
 
-C$OMP PARALELL DO DEFAULT(SHARED) PRIVATE(i,j)
+C$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(i,j)
         do j=1,ns
           do i=1,ns
             amat(i,j)=0
@@ -632,7 +632,7 @@ c       entries, skipping entries within nskip of the diagonal
 c
 
       nn = ns*(2*ncorr+1)
-C$OMP PARALELL DO DEFAULT(SHARED) PRIVATE(j)
+C$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(j)
         do j=1,nn
           acorr(j) = 0
         enddo
