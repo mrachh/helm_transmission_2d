@@ -56,6 +56,8 @@ dys = fnval(tplane,dyplane);
 ds  = sqrt(dxs.^2 + dys.^2);
 rnx = dys./ds;
 rny = -dxs./ds;
+bd_ref = struct('t_bd',tplane,'h_bd',h,'xs',xs,'ys',ys,'dxs',dxs,'dys',...
+    dys,'ds',ds,'Lplane',L,'nterms',nterms);
 
 %plot(xs,ys);hold on; quiver(xs,ys,rnx,rny)
 
