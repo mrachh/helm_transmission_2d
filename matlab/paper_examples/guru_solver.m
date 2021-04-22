@@ -86,7 +86,7 @@ strcat('data/sol_k',int2str(ceil(khv(n_kh))),...
     '_idom',int2str(idom),'_bctype',int2str(bc_type),'_iimp_func',...
      int2str(iimp_func),'_multifreqmax',int2str(ceil(multifreqmax)),...
     '_cb',num2str(cb),'_ci',num2str(ci),'_damp',num2str(scontrol),...
-    '_iinv_type',int2str(iinv_type),'.mat');
+    '_iinv_type',int2str(iinv_type),'_new.mat');
 
 ifexit = 0;
 
@@ -914,6 +914,15 @@ while ik <= n_kh
     iesc_flag(ik) = iesc;
     it_newtons(ik) = it_newton;
     rhs_mags(ik) = norm(rhs_recast_all)/norm(umeas_test(:));
+    if(nfreqs>1) 
+        rtmp = rhs_all(:,:,ik);
+        rtmp = rtmp(:);
+        umeas_tmp = umeas_test(:,:,ik);
+        umeas_tmp = umeas_tmp(:);
+        rhs_mags2(ik) = norm(rtmp)/norm(umeas_tmp);
+    else
+        rhs_mags2(ik) = norm(rhs_recast_all)/norm(umeas_test(:));
+    end
     ik = ik + 1;
     
     if mod(ik,15) % ~mod(kh,10)
@@ -921,11 +930,11 @@ while ik <= n_kh
       if(iinv_type == 2)
         save(res_file,...
         'bd_sols','lambda_vecs','khv','iesc_flag','it_newtons','rhs_mags',...
-         'bd_inv_refs')
+         'rhs_mags2','bd_inv_refs')
       else
           save(res_file,...
         'bd_sols','khv','iesc_flag','it_newtons','rhs_mags',...
-         'bd_inv_refs')
+         'rhs_mags2','bd_inv_refs')
       end
     end
 
@@ -935,11 +944,11 @@ disp("ik="+ik)
 if(iinv_type == 2)
     save(res_file,...
       'bd_sols','lambda_vecs','khv','iesc_flag','it_newtons','rhs_mags',...
-      'bd_inv_refs')
+      'rhs_mags2','bd_inv_refs')
 else
     save(res_file,...
         'bd_sols','khv','iesc_flag','it_newtons','rhs_mags',...
-         'bd_inv_refs')
+         'rhs_mags2','bd_inv_refs')
 end
 if(ifexit)
    exit;
