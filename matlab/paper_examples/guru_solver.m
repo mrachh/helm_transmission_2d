@@ -6,7 +6,7 @@ addpath('../')
 
 %incident field frequency
 dk    = 0.25;
-n_kh  = 57;
+n_kh  = 77;
 khv   = 1:dk:(1+(n_kh-1)*dk);
 
 % incidence directions
@@ -26,9 +26,9 @@ tgt   = [ x_t; y_t];
 
 
 % Newton stopping criterion
-eps_step    = 1e-3;
-eps_res     = 1e-3;
-max_it      = 200;
+eps_step    = 1e-5;
+eps_res     = 1e-5;
+max_it      = 100;
 
 bd_inv_refs = cell(max_it,n_kh);
 
@@ -40,7 +40,7 @@ noise_lvl = 0.02;
 % which inverse problem, 
 % iinv_type = 1, recover shape, iinv_type = 2, recover shape  + impedance
 
-iinv_type = 1;
+iinv_type = 2;
 
 %generating data
 generate = 0;
@@ -73,21 +73,22 @@ gen_data_file = strcat('data/data_k',int2str(ceil(khv(n_kh))),...
  
  
 gen_data_file= 'data/data_k20_idom1_bctype3_iimp_func1.mat';
+gen_data_file= 'data/data_k20_idom1_bctype3_iimp_func1_highres.mat';
 
  
-ifmultifreq = 1; 
-multifreqmax = 10;
+ifmultifreq = 0; 
+multifreqmax = 0;
 
 cb = 2;
 ci = 0.5;
-scontrol = 1;
+scontrol = 0;
 res_file = ...
 strcat('data/sol_k',int2str(ceil(khv(n_kh))),...
     '_idom',int2str(idom),'_bctype',int2str(bc_type),'_iimp_func',...
      int2str(iimp_func),'_multifreqmax',int2str(ceil(multifreqmax)),...
     '_cb',num2str(cb),'_ci',num2str(ci),'_damp',num2str(scontrol),...
-    '_iinv_type',int2str(iinv_type),'_new.mat');
-
+    '_iinv_type',int2str(iinv_type),'_additive_noise.mat');
+res_file = 'data/sol_k20_idom1_bctype3_iimp_func1_highres_iiv_type2.mat';
 ifexit = 0;
 
 if generate 
@@ -115,7 +116,7 @@ if generate
         Nw = Lplane/wl;
 
         %generating the boundary
-        n_bd  = ceil(50*Nw);
+        n_bd  = ceil(100*Nw);
         if (n_bd < 600)
             n_bd = 600;
         end
@@ -302,6 +303,15 @@ if (ifnoise == 1)
    end
 end
 
+if (ifnoise == 2)
+   for ik=1:length(khv)
+       noise = randn(n_tgt,n_dir)+1i*randn(n_tgt,n_dir);
+       umeas(ik).data = umeas(ik).data + noise_lvl ...
+                .* noise./abs(noise);
+   end
+end
+
+
 %Inverse problem
 ik=1;
 
@@ -351,7 +361,7 @@ end
 
 
 
-while ik <= n_kh
+for ik=1:n_kh
     
     %incident data
     kh = khv(ik);
@@ -377,7 +387,7 @@ while ik <= n_kh
     wl = 2*pi/kh;
     Nw = L/wl;
 
-    n_bd  = ceil(40*Nw);
+    n_bd  = ceil(60*Nw);
     if (n_bd < 300)
     n_bd = 300;
     end
@@ -923,7 +933,6 @@ while ik <= n_kh
     else
         rhs_mags2(ik) = norm(rhs_recast_all)/norm(umeas_test(:));
     end
-    ik = ik + 1;
     
     if mod(ik,15) % ~mod(kh,10)
       disp("ik="+ik)
