@@ -1,0 +1,95 @@
+In these codes we use the following structs and cell arrays to store the relevant info
+
+bc: struct
+bc.type = boundary condition type
+bc.invtype = inverse boundary condition type
+
+
+src_info: struct
+src_info.xs = x coordinates;
+src_info.ys = y coordinates;
+src_info.dxs = dxdt;
+src_info.dys = dydt;
+src_info.ds = sqrt(dxdt**2 + dydt**2);
+src_info.H = curvature;
+src_info.L = length of curve;
+src_info.h = h of equispaced parametrization;
+src_info.lambda = impedance function at discretization nodes;
+src_info.lambda_fun = function evaluator for impedance, treated as a function on
+[0,2\pi]
+src_info.Der = spectral differentiation matrix for given source struct;
+
+mats: struct
+mats.Fw_mat = forward operator for the boundary value problem
+mats.inv_Fw_mat = inverse of the forward operator for the boundary value problem
+mats.Fw_dir_mat = get dirichlet data corresponding to representation
+mats.Fw_neu_mat = get neumann data corresponding to representation
+mats.sol_to_receptor = matrix mapping solution of integral equation to 
+                     scattered field at sensor locations
+optional storage for mats
+mats.S = single layer potential
+mats.D = principal value part of double layer potential
+mats.Sp = principal value part of normal derivative of single layer potential
+mats.Sik = single layer potential with frequency i*k
+mats.Spik = principal value part of normal derivative of Sik
+mats.ddiff = difference of double layer potentials
+                     
+
+
+fields: struct
+fields.uinc = incident field
+fields.dudninc = normal derivative of incident field
+fields.uscat = scattered field
+fields.dudnscat = normal derivative of scattered field
+
+u_meas: cell(1,nfreq)
+u_meas{i}.data = measurements of scattered field at sensor locations
+u_meas{i}.xtgt = x coordinates of sensor locations
+u_meas{i}.ytgt = y coordinates of sensor locations
+u_meas{i}.x_dir = cos(incident direction)
+u_meas{i}.y_dir = sin(incident direction)
+
+optim_opts = struct
+   optim_type = 'gn', 'sd', 'dogleg', 'sd-gn', 'sd-dogleg'
+   eps_curve
+   eps_res
+   eps_upd
+   sd_iter
+
+
+nkhuse
+inverse_sol_data: struct
+   srcinfo_all  
+   srcinfo_opt 
+   khuse  
+   residue_all 
+   iters 
+   residue_opt 
+   optim_params 
+   rcond 
+   exit_criterion 
+   fields_all
+   fields_opt
+
+
+deltas = cell(1,maxit)
+  nmodes_bdry
+  nmodes_imp
+  delta_bdry
+  delta_imp
+
+
+sensor_info:
+   xtgt
+   ytgt
+   xdir
+   ydir
+
+subroutines:
+    mats = get_fw_mats(kh,norder,src_info,bc,sensor_info,opts)
+    Minv = get_frechet_ders(mats,src_info,fields,bc)
+    [inverse_sol_data, src_info_out] = inverse_solver(nfreq,kh,ikh,src_info,
+        bc,u_meas,optim_params)
+    [eps_curv,ifintersect] = check_geom(src_info)
+    [deltas,mats_out,src_out,fields_out] = update_geom(nfreq,kh,ikh,src_info,u_meas,bc,optim_opts)
+
