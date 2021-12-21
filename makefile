@@ -12,7 +12,7 @@
 CC=gcc
 FC=gfortran
 
-FFLAGS= -fPIC -O3 -march=native -funroll-loops -std=legacy -w 
+FFLAGS= -fPIC -O3 -funroll-loops -std=legacy -w 
 CFLAGS= -std=c99 
 CFLAGS+= $(FFLAGS)
 #LDFLAGS="-L/usr/local/opt/openblas/lib"
@@ -23,7 +23,7 @@ CLINK = -lgfortran -lm -ldl
 LIBS = -lm
 
 # flags for MATLAB MEX compilation..
-MFLAGS=-largeArrayDims -lgfortran -DMWF77_UNDERSCORE1 -lm  -ldl 
+MFLAGS=-compatibleArrayDims -lgfortran -DMWF77_UNDERSCORE1 -lm -ldl   
 MWFLAGS=-c99complex -i8 
 
 # location of MATLAB's mex compiler
@@ -89,25 +89,25 @@ GATEWAY3 = $(MWRAPFILE3)
 GATEWAY4 = $(MWRAPFILE4)
 
 matlab:	$(STATICLIB) matlab/src/$(GATEWAY).c matlab/src/$(GATEWAY2).c matlab/src/$(GATEWAY3).c matlab/src/$(GATEWAY4).c
-	$(MEX) matlab/src/$(GATEWAY).c $(STATICLIB) $(MFLAGS) -output matlab/src/kern_mats $(MEX_LIBS);
-	$(MEX) matlab/src/$(GATEWAY2).c $(STATICLIB) $(MFLAGS) -output matlab/src/helm_kernels $(MEXLIBS);
-	$(MEX) matlab/src/$(GATEWAY3).c $(STATICLIB) $(MFLAGS) -output matlab/src/lap_kernels $(MEXLIBS);
-	$(MEX) matlab/src/$(GATEWAY4).c $(STATICLIB) $(MFLAGS) -output matlab/src/curve_resampler $(MEXLIBS);
+	$(MEX) -v matlab/src/$(GATEWAY).c $(STATICLIB) $(MFLAGS) -output matlab/src/kern_mats $(MEX_LIBS);
+	$(MEX) -v matlab/src/$(GATEWAY2).c $(STATICLIB) $(MFLAGS) -output matlab/src/helm_kernels $(MEXLIBS);
+	$(MEX) -v matlab/src/$(GATEWAY3).c $(STATICLIB) $(MFLAGS) -output matlab/src/lap_kernels $(MEXLIBS);
+	$(MEX) -v matlab/src/$(GATEWAY4).c $(STATICLIB) $(MFLAGS) -output matlab/src/curve_resampler $(MEXLIBS);
 
 
 mex:  $(STATICLIB)
 	cd matlab; cd src;  $(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY) -mb $(MWRAPFILE).mw;\
 	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY) -c $(GATEWAY).c $(MWRAPFILE).mw;\
-	$(MEX) $(GATEWAY).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE) $(MEX_LIBS); \
+	$(MEX) -v $(GATEWAY).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE) $(MEX_LIBS); \
 	$(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY2) -mb $(MWRAPFILE2).mw;\
 	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY2) -c $(GATEWAY2).c $(MWRAPFILE2).mw;\
-	$(MEX) $(GATEWAY2).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE2) $(MEX_LIBS);\
+	$(MEX) -v $(GATEWAY2).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE2) $(MEX_LIBS);\
 	$(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY3) -mb $(MWRAPFILE3).mw;\
 	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY3) -c $(GATEWAY3).c $(MWRAPFILE3).mw;\
-	$(MEX) $(GATEWAY3).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE3) $(MEX_LIBS); \
+	$(MEX) -v $(GATEWAY3).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE3) $(MEX_LIBS); \
 	$(MWRAP) $(MWFLAGS) -list -mex $(GATEWAY4) -mb $(MWRAPFILE4).mw;\
 	$(MWRAP) $(MWFLAGS) -mex $(GATEWAY4) -c $(GATEWAY4).c $(MWRAPFILE4).mw;\
-	$(MEX) $(GATEWAY4).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE4) $(MEX_LIBS);
+	$(MEX) -v $(GATEWAY4).c ../../$(STATICLIB) $(MFLAGS) -output $(MWRAPFILE4) $(MEX_LIBS);
 
 #
 ##  examples

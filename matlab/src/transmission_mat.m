@@ -36,7 +36,7 @@ function [xmat] = transmission_mat(zks,a,b,norder,h,srcinfo)
   assert(m==6,'srcinfo must be of shape (5,n)');
   xmat = complex(zeros(2*n),0);
   nsys = 2*n;
-  mex_id_ = 'trans_mat(i size_t[x], i size_t[x], i double[x], i double[xx], i dcomplex[x], i dcomplex[x], i dcomplex[x], io dcomplex[xx])';
+  mex_id_ = 'trans_mat(i int64_t[x], i int64_t[x], i double[x], i double[xx], i dcomplex[x], i dcomplex[x], i dcomplex[x], io dcomplex[xx])';
 [xmat] = kern_mats(mex_id_, n, norder, h, srcinfo, zks, a, b, xmat, 1, 1, 1, 6, n, 2, 2, 2, nsys, nsys);
 end
   

@@ -496,3 +496,52 @@ c
 
       return
       end
+c
+c
+c
+c
+c
+      subroutine helm_d_gn(n,srcinfo,m,targinfo,zk,u)
+      implicit real *8 (a-h,o-z)
+      integer ipars
+      real *8 dpars,srcinfo(4,n),targinfo(4,m),xd,yd
+      complex *16 u(m,n),h0,ima,zs,z,zk,h1,gx,gy,ztmp
+      complex *16 h2,d2gdx2,d2gdxdy,d2gdy2,dgn
+      data ima/(0.0d0,1.0d0)/
+      data zs/(0.0d0,0.25d0)/
+
+
+      ifexpon = 1
+      do i=1,n
+        do j=1,m
+           xd = targinfo(1,j) - srcinfo(1,i)
+           yd = targinfo(2,j) - srcinfo(2,i)
+           rr2 = (srcinfo(1,i)-targinfo(1,j))**2 + 
+     1         (srcinfo(2,i)-targinfo(2,j))**2
+           rr = dsqrt(rr2)
+           rinv = 1/rr
+           z = zk*rr
+           call hank103(z,h0,h1,ifexpon)
+           h2 = (2/z*h1 - h0)*zk
+
+           d2gdx2 = (-h1*rinv + h2*xd*xd)*zk*zs
+           d2gdxdy = h2*xd*yd*zk*zs
+           d2gdy2 = (-h1*rinv + h2*yd*yd)*zk*zs
+
+           dgn = -(d2gdx2*srcinfo(3,i)*targinfo(3,j) + 
+     1       d2gdxdy*(srcinfo(3,i)*targinfo(4,j) +
+     2       srcinfo(4,i)*targinfo(3,j)) + 
+     3       d2gdy2*srcinfo(4,i)*targinfo(4,j))
+
+      
+           u(j,i) = dgn 
+         enddo
+       enddo
+
+      return
+      end
+c
+c
+c
+c
+c

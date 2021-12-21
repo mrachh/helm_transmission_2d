@@ -694,10 +694,10 @@ for ik=1:n_kh
             it_filtering     = it_filtering + 1;
         end
 
-	if it_filtering>N_it_filtering
-		src_info = srcout;
-		L = Lout;
-	end
+        if it_filtering>N_it_filtering
+            src_info = srcout;
+            L = Lout;
+        end
 
         %%%%%%%%%%%Shape%%%%%%%%%%%%%%
         %generating the boundary

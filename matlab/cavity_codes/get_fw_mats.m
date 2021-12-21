@@ -30,7 +30,25 @@ function [mats,varargout] = get_fw_mats(kh,src_info,bc,sensor_info,opts)
 %      opts.test_analytic - flag for whether to test for analytic solution
 %         (false)
 %      opts.src_in - interior point if testing analytic solution (0,0)
+%      opts.store_all - store all matrices that arose in discretiztion
+%      (false)
 % Output
+%    mats.Fw_mat - Matrix corresponding to discretizing the boundary
+%    integral equation
+%    mats.inv_Fw_mat = inverse of mats.Fw_mat
+%    mats.Fw_dir_mat = matrix to obtain dirichlet data from the given
+%       representation
+%    mats.Fw_neu_mat = matrix to obtain Neumann data from given
+%       representation (note that this is slightly different when
+%       solving Dirichlet problem, see documentation below)
+%    mats.sol_to_receptor - matrix mapping solution on boundary to 
+%       potential at receptors
+%    mats.bdrydata_to_receptor - matrix mapping boundary data to 
+%       potential at receptors
+%    mats.S, mats.D, mats.Sp, mats.Spik, mats.ddiff, mats.Sik - 
+%       optional matrices used in discretization which will
+%       be stored if opts.store_all = true
+%    
 %
    if nargin < 5
        opts = [];
@@ -58,6 +76,11 @@ function [mats,varargout] = get_fw_mats(kh,src_info,bc,sensor_info,opts)
        end
    end
    
+   store_all = false;
+   if isfield(opts,'store_all')
+       store_all = opts.store_all;
+   end
+   
 
    
    
@@ -83,7 +106,8 @@ function [mats,varargout] = get_fw_mats(kh,src_info,bc,sensor_info,opts)
    src(3,:) = src_info.dxs;
    src(4,:) = src_info.dys;
    
-   tgt = [sensor_info.xtgt; sensor_info.ytgt];
+   [tgt] = unique(sensor_info.tgt','rows');
+   tgt = tgt';
    varargout{1} = 0;
    
    if ~ifflam
@@ -117,6 +141,7 @@ function [mats,varargout] = get_fw_mats(kh,src_info,bc,sensor_info,opts)
           S_tgt = slmat_out(kh,h_bd,src,tgt);
           D_tgt = dlmat_out(kh,h_bd,src,tgt); 
           mats.sol_to_receptor = (D_tgt + 1i * kh * S_tgt);
+          mats.bdrydata_to_receptor = mats.sol_to_receptor*mats.inv_Fw_mat;
           
           if (test_analytic)
               %data for checking  
@@ -127,6 +152,12 @@ function [mats,varargout] = get_fw_mats(kh,src_info,bc,sensor_info,opts)
             utest = mats.sol_to_receptor * sol_a;  
             uex = helm_c_p(kh,src_in,tgt); 
             varargout{1} = norm(utest(:)-uex(:))/norm(uex(:));
+          end
+          
+          if(store_all)
+              mats.S = S;
+              mats.Sp = Sp;
+              mats.D = D;
           end
       end
       
@@ -163,6 +194,7 @@ function [mats,varargout] = get_fw_mats(kh,src_info,bc,sensor_info,opts)
           S_tgt = slmat_out(kh,h_bd,src,tgt);
           D_tgt = dlmat_out(kh,h_bd,src,tgt); 
           mats.sol_to_receptor = (S_tgt + 1i * kh * D_tgt*Sik);
+          mats.bdrydata_to_receptor = mats.sol_to_receptor*mats.inv_Fw_mat;
           if (test_analytic)
             %data for checking    
             
@@ -174,6 +206,15 @@ function [mats,varargout] = get_fw_mats(kh,src_info,bc,sensor_info,opts)
             uex = helm_c_p(kh,src_in,tgt); 
             varargout{1} = norm(utest(:)-uex(:))/norm(uex(:));
           end 
+          
+          if (store_all)
+              mats.S = S;
+              mats.Sp = Sp;
+              mats.D = D;
+              mats.Sik = Sik;
+              mats.Spik = Spik;
+              mats.ddiff = ddiff;
+          end
       end
       
       
@@ -215,6 +256,7 @@ function [mats,varargout] = get_fw_mats(kh,src_info,bc,sensor_info,opts)
           S_tgt = slmat_out(kh,h_bd,src,tgt);
           D_tgt = dlmat_out(kh,h_bd,src,tgt); 
           mats.sol_to_receptor = (S_tgt + 1i * kh * D_tgt*Sik);
+          mats.bdrydata_to_receptor = mats.sol_to_receptor*mats.inv_Fw_mat;
           if (test_analytic)
             %data for checking    
             uin_a = helm_c_p(kh,src_in,srctmp);
@@ -226,6 +268,14 @@ function [mats,varargout] = get_fw_mats(kh,src_info,bc,sensor_info,opts)
             uex = helm_c_p(kh,src_in,tgt); 
             varargout{1} = norm(utest(:)-uex(:))/norm(uex(:));
           end 
+          if (store_all)
+              mats.S = S;
+              mats.Sp = Sp;
+              mats.D = D;
+              mats.Sik = Sik;
+              mats.Spik = Spik;
+              mats.ddiff = ddiff;
+          end
       end
    end
 end

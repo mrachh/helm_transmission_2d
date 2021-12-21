@@ -66,7 +66,6 @@ err = max(abs(srcout(3,:) - dys./ds));
 disp(err)
 err = max(abs(srcout(4,:) - (-dxs./ds)));
 disp(err)
-return
 
 var_up(1) = 0;
 var_up(4) = 0.5;

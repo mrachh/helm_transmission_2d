@@ -13,11 +13,16 @@ src_info.dys = dydt;
 src_info.ds = sqrt(dxdt**2 + dydt**2);
 src_info.H = curvature;
 src_info.L = length of curve;
+src_info.paramL = length in parameter space
 src_info.h = h of equispaced parametrization;
 src_info.lambda = impedance function at discretization nodes;
 src_info.lambda_fun = function evaluator for impedance, treated as a function on
 [0,2\pi]
-src_info.Der = spectral differentiation matrix for given source struct;
+src_info.Der = spectral differentiation matrix with respect to arclength for given source struct;
+src_info.Der_param = spectral differentiation matrix in parameter space
+
+The curve is assumed to be an equispaced discretization on [0,paramL]
+with n nodes 0:paramL/n:paramL*(1-1/n)
 
 mats: struct
 mats.Fw_mat = forward operator for the boundary value problem
@@ -34,27 +39,38 @@ mats.Sik = single layer potential with frequency i*k
 mats.Spik = principal value part of normal derivative of Sik
 mats.ddiff = difference of double layer potentials
                      
-
+frechet_mats: struct
+frechet_mats.bdry = frechet derivative for boundary update
+frechet_mats.impednace = frechet derivative for impedance update
 
 fields: struct
 fields.uinc = incident field
 fields.dudninc = normal derivative of incident field
 fields.uscat = scattered field
 fields.dudnscat = normal derivative of scattered field
+fields.uscat_tgt = scattered field at target locations
 
 u_meas: cell(1,nfreq)
-u_meas{i}.data = measurements of scattered field at sensor locations
+The measurements correspond to a 4 tuple (xtgt,ytgt,xdir,ydir)
+This is different from the previous generation of codes where there was a tensor
+product of sensor locations and incident directions.
+
+u_meas{i}.uscat = measurements of scattered field at sensor locations
 u_meas{i}.xtgt = x coordinates of sensor locations
 u_meas{i}.ytgt = y coordinates of sensor locations
-u_meas{i}.x_dir = cos(incident direction)
-u_meas{i}.y_dir = sin(incident direction)
+u_meas{i}.xdir = cos(incident direction)
+u_meas{i}.ydir = sin(incident direction)
 
 optim_opts = struct
-   optim_type = 'gn', 'sd', 'dogleg', 'sd-gn', 'sd-dogleg'
+   optim_type = 'gn', 'sd', 'min(sd,gn)', 'sd-gn', 'sd-min(sd,gn)'
    eps_curve
    eps_res
    eps_upd
-   sd_iter
+   sd_iter, must be less than maxit
+   maxit
+   maxit_filter
+   filter_type 'gauss-conv','step-length'
+
 
 
 nkhuse
@@ -65,8 +81,7 @@ inverse_sol_data: struct
    residue_all 
    iters 
    residue_opt 
-   optim_params 
-   rcond 
+   optim_opts 
    exit_criterion 
    fields_all
    fields_opt
@@ -76,7 +91,9 @@ deltas = cell(1,maxit)
   nmodes_bdry
   nmodes_imp
   delta_bdry
-  delta_imp
+  delta_impedance
+  iter_filter_bdry
+  iter_type
 
 
 sensor_info:
@@ -86,10 +103,11 @@ sensor_info:
    ydir
 
 subroutines:
-    mats = get_fw_mats(kh,norder,src_info,bc,sensor_info,opts)
-    Minv = get_frechet_ders(mats,src_info,fields,bc)
+    [src_out,ier] = update_geom(src_info,nh,hcoefs,opts);       - done 
+    mats = get_fw_mats(kh,norder,src_info,bc,sensor_info,opts);  - done
+    [frechet_mats] = get_frechet_ders(mats,src_info,fields,bc,opts); - done
+    [fields] = compute_fields(mats,sensor_info,bc,opts); - done
     [inverse_sol_data, src_info_out] = inverse_solver(nfreq,kh,ikh,src_info,
-        bc,u_meas,optim_params)
-    [eps_curv,ifintersect] = check_geom(src_info)
-    [deltas,mats_out,src_out,fields_out] = update_geom(nfreq,kh,ikh,src_info,u_meas,bc,optim_opts)
-
+        bc,u_meas,optim_params);
+    [deltas,mats_out,src_out,fields_out,ier] = update_inverse_iterate(nfreq,kh,ikh,src_info,u_meas,bc,optim_opts)
+    

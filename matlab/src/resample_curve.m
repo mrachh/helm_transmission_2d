@@ -101,7 +101,7 @@ function [varargout] = resample_curve(srcinfo,rl,nh,hcoefs,nout,eps)
   rltot = 0.0;
   lsave = 0;
   
-  mex_id_ = 'curve_resampler_guru(io size_t[x], i size_t[x], i size_t[x], i dcomplex[x], i double[x], i size_t[x], i double[x], io double[x], io double[xx], io double[x], io double[x], io double[x], i size_t[x], io size_t[x])';
+  mex_id_ = 'curve_resampler_guru(io int64_t[x], i int64_t[x], i int64_t[x], i dcomplex[x], i double[x], i int64_t[x], i double[x], io double[x], io double[xx], io double[x], io double[x], io double[x], i int64_t[x], io int64_t[x])';
 [ier, tts, sinfo, hout, rltot, work, lsave] = curve_resampler(mex_id_, ier, n, nhuse, par1, rl, nuse, epsuse, tts, sinfo, hout, rltot, work, lw, lsave, 1, 1, 1, npar1, 1, 1, 1, nn, 4, nuse, 1, 1, lw, 1, 1);
   
   srcinfoout = zeros(6,nuse);
