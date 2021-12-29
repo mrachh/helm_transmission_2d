@@ -59,19 +59,105 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
 %    to be fixed
 %------
 %   
+% Input:
+%   kh - Helmholtz wave number
+%   src_info - source info struct;
+%      src_info.xs = x coordinates;
+%      src_info.ys = y coordinates;
+%      src_info.dxs = dxdt;
+%      src_info.dys = dydt;
+%      src_info.ds = sqrt(dxdt^2 + dydt^2);
+%      src_info.h = h in trapezoidal parametrization;
+%      src_info.lambda - imepdance value at discretization nodes 
+%           (optional if solving impedance boundary value problem);
+%   mats - matrix structure
+%    mats.Fw_mat - Matrix corresponding to discretizing the boundary
+%    integral equation
+%    mats.inv_Fw_mat = inverse of mats.Fw_mat
+%    mats.Fw_dir_mat = matrix to obtain dirichlet data from the given
+%       representation
+%    mats.Fw_neu_mat = matrix to obtain Neumann data from given
+%       representation (note that this is slightly different when
+%       solving Dirichlet problem, see documentation below)
+%    mats.sol_to_receptor - matrix mapping solution on boundary to 
+%       potential at receptors
+%    mats.bdrydata_to_receptor - matrix mapping boundary data to 
+%       potential at receptors
+%  fields - fields struct
+%    fields.uinc(n,ndir) - incident field on the boundary due to
+%      the incident fields given by the unique (ndir) directions 
+%      in the sensor_info.tdir array
+%    fields.dudninc(n,ndir) - the corresponding normal derivative of 
+%       the incident field on the boundary
+%    fields.uscat(n,ndir) - scattered field on the boundary due to
+%      the incident fields given by the unique (ndir) directions 
+%      in the sensor_info.tdir array
+%    fields.dudnscat(n,ndir) - the corresponding normal derivative of 
+%       scattered field on the boundary
+%    fields.uscat_tgt(nmeas) - scattered field at the sensor locations
+%  u_meas - measurement data struct
+%      u_meas.tgt(2,nmeas) - xy cooordinates of sensors
+%         u_meas.tgt(1:2,i) = xy coordinates corresponding the ith
+%            measurement
+%      u_meas.t_dir(nmeas) - incident directions
+%         u_meas.t_dir(i) - is the incident direction corresponding to
+%            the ith measurement
+%      u_meas.uscat_tgt(nmeas) - scattered field corresponding to the 
+%          measurements
+%   bc - boundary condition struct;
+%     bc.type = type of boundary condition;
+%        'd' or 'Dirichlet' for dirichlet
+%        'n' or 'Neumann' for Neumann
+%        'i' or 'Impedance' for impedance
+%     bc.invtype = type of inverse problem;
+%        'o' or 'obstacle' for obstacle only
+%        'oi' or 'obsctacle and impedance' for both obstacle and impedance;
+% 
 %
+% Optional input arguments
+%    optim_opts - optimization options struct, default values in brackets
+%       optim_opts.eps_curv: constraint for high frequency content of
+%             curvature of geometry (Inf)
+%       optim_opts.ncurv: fourier coefficient number for defining 
+%           the tail of curvature for imposing above constraint
+%           (max(30,opts.ncoeff_boundary))
+%       optim_opts.optim_type: optimization type ('gn')
+%            'gn' - gauss newton
+%            'sd' - steepest descent
+%            'min(sd,gn)','min(gn,sd)' - best of gauss newton or steepest
+%            descent
+%       optim_opts.filter_type: curve update filteration type, invoked if
+%          curve is self intersecting or curvature does not satisfy
+%          contraint ('gauss-conv')
+%             'gauss-conv' - convolve update with gaussian
+%             'step_length' - decrease step size by factor of 2
+%       optim_opts.maxit_filter: maximum number of iterations of applying
+%          the curve update filter (10)
 %
+%   opts - options struct, default values in brackets
+%      opts.ncoeff_boundary: number of terms in boundary update
+%         ceil(2*abs(kh))
+%      opts.ncoeff_impedance: number of terms in impedance update
+%         ceil(0.5*abs(kh))
+%      opts.nppw: points per wavelength for discretizing updated curve (10)
+%      opts.verbose: flag for displaying verbose messages during run
+%      (false)
 %
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
+% Output argument
+%   deltas: update struct
+%      deltas.nmodes_bdry: number of modes used to update the boundary
+%      deltas.nmodes_imp: number of modes used to update the impedance
+%      deltas.delta_bdry: boundary update coefficients
+%      deltas.delta_imp: impedance update coefficients
+%      deltas.iter_filter_bdry: number of iterations of filter used to
+%         obtain the update
+%      deltas.iter_type: type of optimization used in the update step
+%   src_out: ouput source info struct
+%   mats_out: output mats struct
+%   fields_out: output fields struct
+%   res: relative residue
+%   ier: error code
+%      ier = 0 implies successful execution
 %
 
     deltas = [];
@@ -132,7 +218,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
         verbose = opts.verbose;
     end
     
-    rhs = u_meas.uscat(:) - fields.uscat_tgt(:);
+    rhs = u_meas.uscat_tgt(:) - fields.uscat_tgt(:);
     frechet_mats = get_frechet_ders(kh,mats,src_info,u_meas,fields,bc,opts_use);
     
     
@@ -199,8 +285,8 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
             delta_bdry_sd0 = delta_bdry_sd;
             %ier_sd = 10;
             iter_filter_bdry_sd = -1;
+            ier_sd = 10;
             for iter=1:maxit_filter
-                ier_sd = 10;
                 [src_out_sd,ier_sd] = update_geom(src_info,ncoeff_boundary,delta_bdry_sd,opts_update_geom);
                 if(ier_sd == 0) 
                     iter_filter_bdry_sd = iter-1;
@@ -245,8 +331,8 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
         elseif(strcmpi(optim_type,'sd'))
             deltas.iter_type = 'sd';
         elseif(strcmpi(optim_type,'min(sd,gn)') || strcmpi(optim_type,'min(gn,sd)'))
-            rhs_gn = u_meas.uscat(:) - fields_out_gn.uscat_tgt(:);
-            rhs_sd = u_meas.uscat(:) - fields_out_sd.uscat_tgt(:);
+            rhs_gn = u_meas.uscat_tgt(:) - fields_out_gn.uscat_tgt(:);
+            rhs_sd = u_meas.uscat_tgt(:) - fields_out_sd.uscat_tgt(:);
             if(norm(rhs_gn(:)) < norm(rhs_sd(:)))
                 deltas.iter_type = 'gn';
             else
@@ -257,16 +343,16 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
         end
         
         if(strcmpi(deltas.iter_type,'gn'))
-            rhs_gn = u_meas.uscat(:) - fields_out_gn.uscat_tgt(:);
+            rhs_gn = u_meas.uscat_tgt(:) - fields_out_gn.uscat_tgt(:);
             deltas.delta_bdry = delta_bdry_gn;
             deltas.iter_filter_bdry = iter_filter_bdry_gn;
             mats_out = mats_out_gn;
             fields_out = fields_out_gn;
             ier = ier_gn;
             src_out = src_out_gn;
-            res = norm(rhs_gn(:))/norm(u_meas.uscat(:));
+            res = norm(rhs_gn(:))/norm(u_meas.uscat_tgt(:));
         elseif(strcmpi(deltas.iter_type,'sd'))
-            rhs_sd = u_meas.uscat(:) - fields_out_sd.uscat_tgt(:);
+            rhs_sd = u_meas.uscat_tgt(:) - fields_out_sd.uscat_tgt(:);
             deltas.delta_bdry = delta_bdry_sd;
             deltas.iter_filter_bdry = iter_filter_bdry_sd;
             
@@ -274,7 +360,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
             fields_out = fields_out_sd;
             ier = ier_sd;
             src_out = src_out_sd;
-            res = norm(rhs_sd(:))/norm(u_meas.uscat(:));
+            res = norm(rhs_sd(:))/norm(u_meas.uscat_tgt(:));
         end      
     end
     if(strcmpi(bc.invtype,'i') || strcmpi(bc.invtype,'oi') || strcmpi(bc.invtype,'io'))
@@ -292,7 +378,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
 %       update matrices and fields after updated impedance        
         mats_out = get_fw_mats(kh,src_out,bc,u_meas,opts);
         fields_out = compute_fields(kh,src_out,mats_out,u_meas,bc,opts);
-        rhs = u_meas.uscat(:) - fields_out.uscat_tgt(:);
-        res = norm(rhs(:))/norm(u_meas.uscat(:));
+        rhs = u_meas.uscat_tgt(:) - fields_out.uscat_tgt(:);
+        res = norm(rhs(:))/norm(u_meas.uscat_tgt(:));
     end 
 end

@@ -1,5 +1,137 @@
 function [inverse_sol_data,src_info_out] = inverse_solver(kh,src_info,bc, ...
      u_meas,optim_opts,opts)
+%
+%  This subroutine endeavors to find the optimal \Gamma, \lambda such that
+%  for a given frequency k the objective function
+%
+%  \sum_{j}| F(k,\bx_{j},d_{j}, \Gamma, \lambda - u_meas.uscat_tgt(j)|^2
+%     is minimized
+%
+%  Here F(k,\bx_{j}, d_{j}, \Gamma, \lambda) denotes the scattered
+%  field at frequency k, at target location \bx_{j}, due to incident 
+%  field given by plane wave with direction $d_{j}$, where
+%  the boundary of the curve is given by $\Gamma$ and the impedance
+%  function given by $\lambda$ (note that the impedance function)
+%  is optional, and u_meas denotes the corresponding measured data.
+%
+%  We support 5 optimization methods for updating the boundary/impedance
+%   sd - Steepest descent with step size set to the Cauchy point
+%   gn - Gauss Newton
+%   min(gn,sd) or min(sd,gn) - Use the better of steepest descent or Gauss-newton
+%   sd-gn - steepest descent for the first few iterations followed by
+%     Gauss-newton
+%   sd-min(gn,sd) or sd-min(sd,gn) - Steepest descent for first few
+%   iterations followed by best of Gauss-newton and steepest descent.
+%
+%   If during any optimization step,
+%   the updated curve is self-intersecting or if the curvature
+%   is requested to have a nearly band limited tail then,
+%   the above updates are modified by either scaling them by 2^i 
+%   for i<=maxit_filtering, so that the conditions are met, or
+%   by damping the high frequency components of the update using 
+%   a Gaussian until the conditions are met.
+%
+%   If the conditions aren't met with the maximum filtering iterations, 
+%   then the input curve is returned with an error code
+%   
+% Input:
+%   kh - Helmholtz wave number
+%   src_info - source info struct;
+%      src_info.xs = x coordinates;
+%      src_info.ys = y coordinates;
+%      src_info.dxs = dxdt;
+%      src_info.dys = dydt;
+%      src_info.ds = sqrt(dxdt^2 + dydt^2);
+%      src_info.h = h in trapezoidal parametrization;
+%      src_info.lambda - imepdance value at discretization nodes 
+%           (optional if solving impedance boundary value problem);
+%  u_meas - measurement data struct
+%      u_meas.tgt(2,nmeas) - xy cooordinates of sensors
+%         u_meas.tgt(1:2,i) = xy coordinates corresponding the ith
+%            measurement
+%      u_meas.t_dir(nmeas) - incident directions
+%         u_meas.t_dir(i) - is the incident direction corresponding to
+%            the ith measurement
+%      u_meas.uscat_tgt(nmeas) - scattered field corresponding to the 
+%          measurements
+%   bc - boundary condition struct;
+%     bc.type = type of boundary condition;
+%        'd' or 'Dirichlet' for dirichlet
+%        'n' or 'Neumann' for Neumann
+%        'i' or 'Impedance' for impedance
+%     bc.invtype = type of inverse problem;
+%        'o' or 'obstacle' for obstacle only
+%        'oi' or 'obsctacle and impedance' for both obstacle and impedance;
+% 
+%
+% Optional input arguments
+%    optim_opts - optimization options struct, default values in brackets
+%       optim_opts.eps_curv: constraint for high frequency content of
+%             curvature of geometry (Inf)
+%       optim_opts.ncurv: fourier coefficient number for defining 
+%           the tail of curvature for imposing above constraint
+%           (max(30,opts.ncoeff_boundary))
+%       optim_opts.optim_type: optimization type ('gn')
+%            'gn' - gauss newton
+%            'sd' - steepest descent
+%            'min(sd,gn)','min(gn,sd)' - best of gauss newton or steepest
+%            descent
+%            'sd-gn' - steepest descent followed b gauss-newton
+%            'sd-min(sd,gn)' or 'sd-min(gn,sd)' - steepest descent
+%               followed by best of steepest descent or gauss-newton
+%       optim_opts.filter_type: curve update filteration type, invoked if
+%          curve is self intersecting or curvature does not satisfy
+%          contraint ('gauss-conv')
+%             'gauss-conv' - convolve update with gaussian
+%             'step_length' - decrease step size by factor of 2
+%       optim_opts.maxit_filter: maximum number of iterations of applying
+%          the curve update filter (10)
+%       optim_opts.maxit: maximum number of outer optimization iterations
+%       (100)
+%       optim_opts.sd_iter: number of initial steepest descent iterations
+%           if applicable (50)
+%       optim_opts.eps_upd: exit criterion for declaring local optimum
+%          based on l2 norm of update (1e-5)
+%       optim_opts.eps_res: exit criterion for declaring local optimum
+%          based on l2 norm of relative residual (1e-5)
+%
+%   opts - options struct, default values in brackets
+%      opts.ncoeff_boundary_mult: multiplier for 
+%         number of terms in boundary update given by
+%         ceil(ncoeff_boundary_mult*abs(kh)) (2)
+%      opts.ncoeff_impedance_mult: multiplier for number of terms in impedance update
+%         ceil(ncoeff_impedance_mult*abs(kh)) (0.5)
+%      opts.nppw: points per wavelength for discretizing updated curve (10)
+%      opts.verbose: flag for displaying verbose messages during run
+%      (false)
+%      opts.store_fields: store fields corresponding to each iterate
+%      (false)
+%      opts.store_src_info: store src_info corresponding to each iterate
+%      (false)
+%
+% Output
+% inverse_sol_data: struct containing info through the optimization process
+%    inverse_sol_data.res_all(1:iter_count): residue at each iterate
+%    inverse_sol_data.iter_count: number of iterations before exiting
+%       optimization
+%    inverse_sol_data.src_info_all: source info struct at each iter (if
+%      requested)
+%    inverse_sol_data.src_info_opt: same as src_info_out, optimum src_info
+%      source struct
+%    inverse_sol_data.fields_all: fields at each iterate (if requested)
+%    inverse_sol_data.deltas: deltas struct (update info) for each iterate
+%    inverse_sol_data.fields_opt: fields corresponding to src_info_opt
+%    inverse_sol_data.optim_opts: final optimization parameters used in the
+%      run
+%    inverse_sol_data.exit_criterion: exit criterion for optimization
+%    problem
+%      exit_criterion = -1; at the last iterate curve was self intersecting
+%        or did not satisfy curvature constraint if requested
+%      exit_criterion = 1; if res<eps_res
+%      exit_criterion = 2; if |update| < eps_upd
+%      exit_criterion = 3; out of iterations, i.e. iter_count = maxit;
+% src_info_out: updated source struct upon exiting optimization loop
+ 
     inverse_sol_data = [];
     
     if(nargin<5)

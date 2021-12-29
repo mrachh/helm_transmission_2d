@@ -15,6 +15,12 @@ L = src_info.L;
 
 nk = 9;
 
+
+% Test obstacle Frechet derivative for Dirichlet problem
+bc = [];
+bc.type = 'Dirichlet';
+bc.invtype = 'o';
+
 fname = ['../data/star3_ik1_nk' int2str(nk) '_tensor_data_' bc.type '.mat'];
 save(fname,'src_info');
 
@@ -59,12 +65,6 @@ u_meas = cell(nk,1);
 
 
 
-
-% Test obstacle Frechet derivative for Dirichlet problem
-bc = [];
-bc.type = 'Dirichlet';
-bc.invtype = 'o';
-
 nppw = 20;
 
 for ik=1:nk
@@ -77,7 +77,7 @@ for ik=1:nk
    
    u_meas0 = [];
    u_meas0.kh = kh(ik);
-   u_meas0.uscat = fields.uscat_tgt;
+   u_meas0.uscat_tgt = fields.uscat_tgt;
    u_meas0.tgt = sensor_info.tgt;
    u_meas0.t_dir = sensor_info.t_dir;
    u_meas0.err_est = erra;

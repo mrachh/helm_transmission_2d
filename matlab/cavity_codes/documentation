@@ -4,6 +4,7 @@ bc: struct
 bc.type = boundary condition type
 bc.invtype = inverse boundary condition type
 
+================================================
 
 src_info: struct
 src_info.xs = x coordinates;
@@ -23,7 +24,7 @@ src_info.Der_param = spectral differentiation matrix in parameter space
 
 The curve is assumed to be an equispaced discretization on [0,paramL]
 with n nodes 0:paramL/n:paramL*(1-1/n)
-
+============================================================
 mats: struct
 mats.Fw_mat = forward operator for the boundary value problem
 mats.inv_Fw_mat = inverse of the forward operator for the boundary value problem
@@ -31,6 +32,9 @@ mats.Fw_dir_mat = get dirichlet data corresponding to representation
 mats.Fw_neu_mat = get neumann data corresponding to representation
 mats.sol_to_receptor = matrix mapping solution of integral equation to 
                      scattered field at sensor locations
+mats.bdrydata_to_receptor = matrix mapping boundary data to scattered field
+   at sensor locations
+
 optional storage for mats
 mats.S = single layer potential
 mats.D = principal value part of double layer potential
@@ -38,10 +42,14 @@ mats.Sp = principal value part of normal derivative of single layer potential
 mats.Sik = single layer potential with frequency i*k
 mats.Spik = principal value part of normal derivative of Sik
 mats.ddiff = difference of double layer potentials
-                     
+=================================================================
+
+
 frechet_mats: struct
 frechet_mats.bdry = frechet derivative for boundary update
 frechet_mats.impednace = frechet derivative for impedance update
+=====================================================
+
 
 fields: struct
 fields.uinc = incident field
@@ -50,20 +58,23 @@ fields.uscat = scattered field
 fields.dudnscat = normal derivative of scattered field
 fields.uscat_tgt = scattered field at target locations
 
+=================================================
+
 u_meas: cell(1,nfreq)
-The measurements correspond to a 4 tuple (xtgt,ytgt,xdir,ydir)
+The measurements correspond to a 3 tuple (xtgt,ytgt,tdir)
 This is different from the previous generation of codes where there was a tensor
 product of sensor locations and incident directions.
 
-u_meas{i}.uscat = measurements of scattered field at sensor locations
-u_meas{i}.xtgt = x coordinates of sensor locations
-u_meas{i}.ytgt = y coordinates of sensor locations
-u_meas{i}.xdir = cos(incident direction)
-u_meas{i}.ydir = sin(incident direction)
+u_meas{i}.kh = frequency corresponding to given data set
+u_meas{i}.uscat_tgt = measurements of scattered field at sensor locations
+u_meas{i}.tgt = xy coordinates of sensor locations
+u_meas{i}.t_dir = incident directions 
+
+============================================
 
 optim_opts = struct
    optim_type = 'gn', 'sd', 'min(sd,gn)', 'sd-gn', 'sd-min(sd,gn)'
-   eps_curve
+   eps_curv
    eps_res
    eps_upd
    sd_iter, must be less than maxit
@@ -71,7 +82,7 @@ optim_opts = struct
    maxit_filter
    filter_type 'gauss-conv','step-length'
 
-
+================================================
 
 nkhuse
 inverse_sol_data: struct
@@ -86,6 +97,7 @@ inverse_sol_data: struct
    fields_all
    fields_opt
 
+=========================================
 
 deltas = cell(1,maxit)
   nmodes_bdry
@@ -94,20 +106,28 @@ deltas = cell(1,maxit)
   delta_impedance
   iter_filter_bdry
   iter_type
+==============================
 
 
 sensor_info:
-   xtgt
-   ytgt
-   xdir
-   ydir
+   tgt
+   t_dir
+
+===============================
 
 subroutines:
-    [src_out,ier] = update_geom(src_info,nh,hcoefs,opts);       - done 
-    mats = get_fw_mats(kh,norder,src_info,bc,sensor_info,opts);  - done
-    [frechet_mats] = get_frechet_ders(mats,src_info,fields,bc,opts); - done
-    [fields] = compute_fields(mats,sensor_info,bc,opts); - done
+    [src_out,ier] = update_geom(src_info,nh,hcoefs,opts);        
+    mats = get_fw_mats(kh,norder,src_info,bc,sensor_info,opts);  
+    [frechet_mats] = get_frechet_ders(mats,src_info,fields,bc,opts); 
+    [fields] = compute_fields(mats,sensor_info,bc,opts); 
     [inverse_sol_data, src_info_out] = inverse_solver(nfreq,kh,ikh,src_info,
         bc,u_meas,optim_params);
-    [deltas,mats_out,src_out,fields_out,ier] = update_inverse_iterate(nfreq,kh,ikh,src_info,u_meas,bc,optim_opts)
+    [deltas,mats_out,src_out,fields_out,ier] = update_inverse_iterate(nfreq,kh,ikh,src_info,u_meas,bc,optim_opts);
+    
+
+
+documentation pending
+
+ rla_inverse_solver
+
     
