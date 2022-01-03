@@ -5,7 +5,7 @@
 
 n  = 300;
 addpath('../');
-nc = 3;
+nc = 9;
 coefs = zeros(2*nc+1,1);
 coefs(1) = 1;
 coefs(nc+1) = 0.3;
@@ -13,7 +13,7 @@ src_info = geometries.starn(coefs,nc,n);
 L = src_info.L;
 
 
-nk = 9;
+nk = 200;
 
 
 % Test obstacle Frechet derivative for Dirichlet problem
