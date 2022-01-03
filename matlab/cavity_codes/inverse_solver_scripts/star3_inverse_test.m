@@ -1,4 +1,6 @@
 load('../data/star3_ik1_nk9_tensor_data_Dirichlet.mat');
+addpath('../');
+addpath('../../src');
 
 optim_opts = [];
 opts = [];
