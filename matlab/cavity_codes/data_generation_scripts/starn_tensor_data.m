@@ -5,7 +5,7 @@
 
 n  = 300;
 addpath('../');
-nc = 3;
+nc = 9;
 coefs = zeros(2*nc+1,1);
 coefs(1) = 1;
 coefs(nc+1) = 0.3;
@@ -13,7 +13,7 @@ src_info = geometries.starn(coefs,nc,n);
 L = src_info.L;
 
 
-nk = 9;
+nk = 100;
 
 
 % Test obstacle Frechet derivative for Dirichlet problem
@@ -21,7 +21,7 @@ bc = [];
 bc.type = 'Dirichlet';
 bc.invtype = 'o';
 
-fname = ['../data/star3_ik1_nk' int2str(nk) '_tensor_data_' bc.type '.mat'];
+fname = ['../data/star9_ik1_nk' int2str(nk) '_tensor_data_' bc.type '.mat'];
 save(fname,'src_info');
 
 
