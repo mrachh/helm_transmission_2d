@@ -10,5 +10,5 @@ optim_opts.optim_type = 'min(gn,sd)';
 optim_opts.eps_curv = 1e-3;
 optim_opts.filter_type = 'step_length';
 opts.store_src_info = true;
-[inv_data_all,src_info_out] = rla_inverse_solver(u_meas,bc,...
+[inv_data_all,src_info_out] = rla.rla_inverse_solver(u_meas,bc,...
                           optim_opts,opts);

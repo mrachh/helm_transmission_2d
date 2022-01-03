@@ -89,7 +89,7 @@ function [src_out,varargout] = update_geom(src_info,nh,hcoefs,opts)
         
     end
 
-    if (~issimple(x_upd,y_upd))
+    if (~rla.issimple(x_upd,y_upd))
         src_out = src_info;
         ier = 1;
         varargout{1} = ier;
@@ -140,7 +140,7 @@ function [src_out,varargout] = update_geom(src_info,nh,hcoefs,opts)
         rsc = 2*pi/Lout;
         src_out.Der = specdiffmat_ds(nout,src_out.ds)*rsc;
         src_out.Der_param = src_out.Der;
-        src_out.H = get_curvature(src_out);
+        src_out.H = rla.get_curvature(src_out);
         
         if(check_curv)
             curvhat = fft(src_out.H);

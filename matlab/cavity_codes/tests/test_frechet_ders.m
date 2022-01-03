@@ -53,13 +53,13 @@ bc = [];
 bc.type = 'Dirichlet';
 bc.invtype = 'o';
 
-[mats,~] = get_fw_mats(kh,src_info,bc,sensor_info,opts);
-fields = compute_fields(kh,src_info,mats,sensor_info,bc,opts);
+[mats,~] = rla.get_fw_mats(kh,src_info,bc,sensor_info,opts);
+fields = rla.compute_fields(kh,src_info,mats,sensor_info,bc,opts);
 
 nh = 4;
 opts.ncoeff_boundary = nh;
 opts.ncoeff_impedance = nh;
-frechet_mats = get_frechet_ders(kh,mats,src_info,sensor_info,fields,bc,opts);
+frechet_mats = rla.get_frechet_ders(kh,mats,src_info,sensor_info,fields,bc,opts);
 
 hcoefs = 0.1*rand(1,2*nh+1);
 uder = frechet_mats.bdry*hcoefs(:);
@@ -69,15 +69,15 @@ errs = zeros(2,1);
 for ig=1:2
     dh = 10^(-ig);
     hcoefs_use = dh*hcoefs;
-    [src_out,~] = update_geom(src_info,nh,hcoefs_use);
-    [mats1,~] = get_fw_mats(kh,src_out,bc,sensor_info,opts);
-    fields1 = compute_fields(kh,src_out,mats1,sensor_info,bc,opts);
+    [src_out,~] = rla.update_geom(src_info,nh,hcoefs_use);
+    [mats1,~] = rla.get_fw_mats(kh,src_out,bc,sensor_info,opts);
+    fields1 = rla.compute_fields(kh,src_out,mats1,sensor_info,bc,opts);
 
     
     hcoefs_use2 = -dh*hcoefs;
-    [src_out2,~] = update_geom(src_info,nh,hcoefs_use2);
-    [mats2,~] = get_fw_mats(kh,src_out2,bc,sensor_info,opts);
-    fields2 = compute_fields(kh,src_out2,mats2,sensor_info,bc,opts);
+    [src_out2,~] = rla.update_geom(src_info,nh,hcoefs_use2);
+    [mats2,~] = rla.get_fw_mats(kh,src_out2,bc,sensor_info,opts);
+    fields2 = rla.compute_fields(kh,src_out2,mats2,sensor_info,bc,opts);
     
     uder_est = (fields1.uscat_tgt(:) - fields2.uscat_tgt(:))/2/dh;
     errs(ig) = norm(uder-uder_est);
@@ -90,11 +90,11 @@ bc = [];
 bc.type = 'Neumann';
 bc.invtype = 'o';
 
-[mats,~] = get_fw_mats(kh,src_info,bc,sensor_info,opts);
-fields = compute_fields(kh,src_info,mats,sensor_info,bc,opts);
+[mats,~] = rla.get_fw_mats(kh,src_info,bc,sensor_info,opts);
+fields = rla.compute_fields(kh,src_info,mats,sensor_info,bc,opts);
 
 
-frechet_mats = get_frechet_ders(kh,mats,src_info,sensor_info,fields,bc,opts);
+frechet_mats = rla.get_frechet_ders(kh,mats,src_info,sensor_info,fields,bc,opts);
 uder = frechet_mats.bdry*hcoefs(:);
 
 
@@ -102,15 +102,15 @@ errs = zeros(2,1);
 for ig=1:2
     dh = 10^(-ig);
     hcoefs_use = dh*hcoefs;
-    [src_out,~] = update_geom(src_info,nh,hcoefs_use);
-    [mats1,~] = get_fw_mats(kh,src_out,bc,sensor_info,opts);
-    fields1 = compute_fields(kh,src_out,mats1,sensor_info,bc,opts);
+    [src_out,~] = rla.update_geom(src_info,nh,hcoefs_use);
+    [mats1,~] = rla.get_fw_mats(kh,src_out,bc,sensor_info,opts);
+    fields1 = rla.compute_fields(kh,src_out,mats1,sensor_info,bc,opts);
 
     
     hcoefs_use2 = -dh*hcoefs;
-    [src_out2,~] = update_geom(src_info,nh,hcoefs_use2);
-    [mats2,~] = get_fw_mats(kh,src_out2,bc,sensor_info,opts);
-    fields2 = compute_fields(kh,src_out2,mats2,sensor_info,bc,opts);
+    [src_out2,~] = rla.update_geom(src_info,nh,hcoefs_use2);
+    [mats2,~] = rla.get_fw_mats(kh,src_out2,bc,sensor_info,opts);
+    fields2 = rla.compute_fields(kh,src_out2,mats2,sensor_info,bc,opts);
     
     uder_est = (fields1.uscat_tgt(:) - fields2.uscat_tgt(:))/2/dh;
     errs(ig) = norm(uder-uder_est);
@@ -125,11 +125,11 @@ bc = [];
 bc.type = 'Impedance';
 bc.invtype = 'oi';
 
-[mats,~] = get_fw_mats(kh,src_info,bc,sensor_info,opts);
-fields = compute_fields(kh,src_info,mats,sensor_info,bc,opts);
+[mats,~] = rla.get_fw_mats(kh,src_info,bc,sensor_info,opts);
+fields = rla.compute_fields(kh,src_info,mats,sensor_info,bc,opts);
 
 
-frechet_mats = get_frechet_ders(kh,mats,src_info,sensor_info,fields,bc,opts);
+frechet_mats = rla.get_frechet_ders(kh,mats,src_info,sensor_info,fields,bc,opts);
 uder = frechet_mats.bdry*hcoefs(:);
 
 
@@ -137,15 +137,15 @@ errs = zeros(2,1);
 for ig=1:2
     dh = 10^(-ig);
     hcoefs_use = dh*hcoefs;
-    [src_out,~] = update_geom(src_info,nh,hcoefs_use);
-    [mats1,~] = get_fw_mats(kh,src_out,bc,sensor_info,opts);
-    fields1 = compute_fields(kh,src_out,mats1,sensor_info,bc,opts);
+    [src_out,~] = rla.update_geom(src_info,nh,hcoefs_use);
+    [mats1,~] = rla.get_fw_mats(kh,src_out,bc,sensor_info,opts);
+    fields1 = rla.compute_fields(kh,src_out,mats1,sensor_info,bc,opts);
 
     
     hcoefs_use2 = -dh*hcoefs;
-    [src_out2,~] = update_geom(src_info,nh,hcoefs_use2);
-    [mats2,~] = get_fw_mats(kh,src_out2,bc,sensor_info,opts);
-    fields2 = compute_fields(kh,src_out2,mats2,sensor_info,bc,opts);
+    [src_out2,~] = rla.update_geom(src_info,nh,hcoefs_use2);
+    [mats2,~] = rla.get_fw_mats(kh,src_out2,bc,sensor_info,opts);
+    fields2 = rla.compute_fields(kh,src_out2,mats2,sensor_info,bc,opts);
     
     uder_est = (fields1.uscat_tgt(:) - fields2.uscat_tgt(:))/2/dh;
     errs(ig) = norm(uder-uder_est);
@@ -165,15 +165,15 @@ for ig=1:2
     src_out = src_info;
     h_upd = (cos(t'*(0:nh))*hcoefs_use(1:(nh+1)) + sin(t'*(1:nh))*hcoefs_use((nh+2):end)).';
     src_out.lambda = src_info.lambda + h_upd';
-    [mats1,~] = get_fw_mats(kh,src_out,bc,sensor_info,opts);
-    fields1 = compute_fields(kh,src_out,mats1,sensor_info,bc,opts);
+    [mats1,~] = rla.get_fw_mats(kh,src_out,bc,sensor_info,opts);
+    fields1 = rla.compute_fields(kh,src_out,mats1,sensor_info,bc,opts);
 
     
     
     src_out2 = src_info;
     src_out2.lambda = src_info.lambda - h_upd';
-    [mats2,~] = get_fw_mats(kh,src_out2,bc,sensor_info,opts);
-    fields2 = compute_fields(kh,src_out2,mats2,sensor_info,bc,opts);
+    [mats2,~] = rla.get_fw_mats(kh,src_out2,bc,sensor_info,opts);
+    fields2 = rla.compute_fields(kh,src_out2,mats2,sensor_info,bc,opts);
     
     uder_est = (fields1.uscat_tgt(:) - fields2.uscat_tgt(:))/2/dh;
     errs(ig) = norm(uder-uder_est);

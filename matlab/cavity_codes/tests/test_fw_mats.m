@@ -35,18 +35,18 @@ bc = [];
 bc.type = 'Dirichlet';
 
 
-[mats,erra] = get_fw_mats(kh,src_info,bc,sensor_info,opts);
+[mats,erra] = rla.get_fw_mats(kh,src_info,bc,sensor_info,opts);
 fprintf('Error in dirichlet problem: %d\n',erra);
 
 
 bc = [];
 bc.type = 'Neumann';
-[mats,erra] = get_fw_mats(kh,src_info,bc,sensor_info,opts);
+[mats,erra] = rla.get_fw_mats(kh,src_info,bc,sensor_info,opts);
 fprintf('Error in Neumann problem: %d\n',erra);
 
 
 src_info.lambda = ones(n,1);
 bc = [];
 bc.type = 'Impedance';
-[mats,erra] = get_fw_mats(kh,src_info,bc,sensor_info,opts);
+[mats,erra] = rla.get_fw_mats(kh,src_info,bc,sensor_info,opts);
 fprintf('Error in Impedance problem: %d\n',erra);

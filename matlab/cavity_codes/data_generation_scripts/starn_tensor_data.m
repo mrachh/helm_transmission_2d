@@ -72,8 +72,8 @@ for ik=1:nk
    n = max(n,300);
    src_info = geometries.starn(coefs,nc,n);
    
-   [mats,erra] = get_fw_mats(kh(ik),src_info,bc,sensor_info,opts);
-   fields = compute_fields(kh(ik),src_info,mats,sensor_info,bc,opts);
+   [mats,erra] = rla.get_fw_mats(kh(ik),src_info,bc,sensor_info,opts);
+   fields = rla.compute_fields(kh(ik),src_info,mats,sensor_info,bc,opts);
    
    u_meas0 = [];
    u_meas0.kh = kh(ik);

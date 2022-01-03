@@ -206,9 +206,8 @@ function [inverse_sol_data,src_info_out] = inverse_solver(kh,src_info,bc, ...
 %  Initialize matrices and fields for iteration 0
 %
     src_use = src_info;
-    mats = get_fw_mats(kh,src_use,bc,u_meas,opts);
-    fields = compute_fields(kh,src_use,mats,u_meas,bc,opts);
-    size(fields);
+    mats = rla.get_fw_mats(kh,src_use,bc,u_meas,opts);
+    fields = rla.compute_fields(kh,src_use,mats,u_meas,bc,opts);
     
     if(verbose)
       fprintf('-------------------------------------\n')
@@ -233,7 +232,7 @@ function [inverse_sol_data,src_info_out] = inverse_solver(kh,src_info,bc, ...
         end
         
         [deltas{iter},src_info_all{iter},mats_out,fields_all{iter},res_all(iter),ier(iter)] = ...
-           update_inverse_iterate(kh,src_use,mats,fields,u_meas,bc,optim_opts,opts);
+           rla.update_inverse_iterate(kh,src_use,mats,fields,u_meas,bc,optim_opts,opts);
         if(verbose)
             fprintf('iter number: %d \t optim_type: %s \t residue: %d \t ier: %d\n',iter,optim_opts_use.optim_type,res_all(iter),ier(iter));
         end

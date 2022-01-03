@@ -21,7 +21,7 @@ drawnow;
 
 nh = 0;
 hcoefs = 0;
-[src_out,ier,tts] = update_geom(src_info,nh,hcoefs);
+[src_out,ier,tts] = rla.update_geom(src_info,nh,hcoefs);
 
 figure
 clf
@@ -48,7 +48,7 @@ hcoefs(nh+1) = 0.3;
 src_info = rmfield(src_info,'lambda');
 
 
-[src_out,ier] = update_geom(src_info,nh,hcoefs);
+[src_out,ier] = rla.update_geom(src_info,nh,hcoefs);
 figure
 clf
 plot(src_out.xs,src_out.ys,'b.')

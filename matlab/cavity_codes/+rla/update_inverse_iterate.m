@@ -219,7 +219,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
     end
     
     rhs = u_meas.uscat_tgt(:) - fields.uscat_tgt(:);
-    frechet_mats = get_frechet_ders(kh,mats,src_info,u_meas,fields,bc,opts_use);
+    frechet_mats = rla.get_frechet_ders(kh,mats,src_info,u_meas,fields,bc,opts_use);
     
     
     opts_update_geom = [];
@@ -242,7 +242,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
             ier_gn = 10;
             iter_filter_bdry_gn = -1;
             for iter=1:maxit_filter
-                [src_out_gn,ier_gn] = update_geom(src_info,ncoeff_boundary,delta_bdry_gn,opts_update_geom);
+                [src_out_gn,ier_gn] = rla.update_geom(src_info,ncoeff_boundary,delta_bdry_gn,opts_update_geom);
                 if(ier_gn == 0) 
                     iter_filter_bdry_gn = iter-1;
                     break
@@ -274,8 +274,8 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
                 mats_out_gn = mats;
                 fields_out_gn = fields;
             else
-                [mats_out_gn] = get_fw_mats(kh,src_out_gn,bc,u_meas,opts);
-                fields_out_gn = compute_fields(kh,src_out_gn,mats_out_gn,u_meas,bc,opts);
+                [mats_out_gn] = rla.get_fw_mats(kh,src_out_gn,bc,u_meas,opts);
+                fields_out_gn = rla.compute_fields(kh,src_out_gn,mats_out_gn,u_meas,bc,opts);
             end
         end
         if(strcmpi(optim_type,'sd')  || strcmpi(optim_type,'min(sd,gn)') || strcmpi(optim_type,'min(gn,sd)'))
@@ -287,7 +287,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
             iter_filter_bdry_sd = -1;
             ier_sd = 10;
             for iter=1:maxit_filter
-                [src_out_sd,ier_sd] = update_geom(src_info,ncoeff_boundary,delta_bdry_sd,opts_update_geom);
+                [src_out_sd,ier_sd] = rla.update_geom(src_info,ncoeff_boundary,delta_bdry_sd,opts_update_geom);
                 if(ier_sd == 0) 
                     iter_filter_bdry_sd = iter-1;
                     break
@@ -320,8 +320,8 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
                 mats_out_sd = mats;
                 fields_out_sd = fields;
             else
-                [mats_out_sd] = get_fw_mats(kh,src_out_sd,bc,u_meas,opts);
-                fields_out_sd = compute_fields(kh,src_out_sd,mats_out_sd,u_meas,bc,opts);
+                [mats_out_sd] = rla.get_fw_mats(kh,src_out_sd,bc,u_meas,opts);
+                fields_out_sd = rla.compute_fields(kh,src_out_sd,mats_out_sd,u_meas,bc,opts);
             end
         end
         
@@ -376,8 +376,8 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
         
         
 %       update matrices and fields after updated impedance        
-        mats_out = get_fw_mats(kh,src_out,bc,u_meas,opts);
-        fields_out = compute_fields(kh,src_out,mats_out,u_meas,bc,opts);
+        mats_out = rla.get_fw_mats(kh,src_out,bc,u_meas,opts);
+        fields_out = rla.compute_fields(kh,src_out,mats_out,u_meas,bc,opts);
         rhs = u_meas.uscat_tgt(:) - fields_out.uscat_tgt(:);
         res = norm(rhs(:))/norm(u_meas.uscat_tgt(:));
     end 
