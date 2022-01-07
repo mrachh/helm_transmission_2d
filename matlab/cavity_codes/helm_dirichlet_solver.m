@@ -51,6 +51,7 @@ chnkr = chunkerpoly(verts,cparams_use,pref);
 
 ref_opts = []; ref_opts.maxchunklen = (2*pi)/abs(kh);
 chnkr = refine(chnkr,ref_opts);
+plot(chnkr)
 
 fkern = @(s,t) chnk.helm2d.kern(kh,s,t,'C',1);
 dval = 0.5;

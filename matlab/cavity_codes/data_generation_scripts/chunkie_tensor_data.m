@@ -11,6 +11,8 @@ coefs(1) = 1;
 coefs(nc+1) = 0.3;
 src_info.xs = [1,2,2,1,-1,-2,-2,-1,-1,-1.5,-1.5,1.5,1.5,1];
 src_info.ys = [-1,0,1,2,2,1,0,-1,0,0,1,1,0,0];
+src_info.xs = [0,1,0,-1];
+src_info.ys = [-1,0,1,0];
 plot(src_info.xs,src_info.ys);
 
 
@@ -85,6 +87,7 @@ for ik=1:nk
    u_meas0.t_dir = sensor_info.t_dir;
    %u_meas0.err_est = erra;
    u_meas{ik} = u_meas0;
+   u_meas0
 end
 
 
