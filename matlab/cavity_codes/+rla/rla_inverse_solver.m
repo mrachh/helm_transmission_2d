@@ -156,7 +156,7 @@ function [inv_data_all,src_info_out] = rla_inverse_solver(u_meas,bc,...
    
    if(isempty(src_init))
        kh0 = u_meas{ik_list(1)}.kh;
-       n = max(300,ceil(abs(kh0)*nppw));
+       n = max(1000,ceil(abs(kh0)*nppw));
        src_init = geometries.ellipse(1,1,n);
    end
    inv_data_all = cell(1,npath);
