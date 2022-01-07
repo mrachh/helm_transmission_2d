@@ -32,9 +32,9 @@ tgt   = [ xtgt'; ytgt'];
 
 % use a random subset of sensor and target location
 % so that they are no longer tensor product
-ifac = 0.1;
+ifac = 1;
 iind_use = randperm(n_dir*n_tgt,ceil(ifac*n_dir*n_tgt));
-
+iind_use = 1:(n_dir*n_tgt);
 sensor_info = [];
 sensor_info.tgt = tgt(:,iind_use);
 sensor_info.t_dir = t_dir_grid(iind_use);
@@ -61,6 +61,7 @@ opts.ncoeff_boundary = nh;
 opts.ncoeff_impedance = nh;
 frechet_mats = rla.get_frechet_ders(kh,mats,src_info,sensor_info,fields,bc,opts);
 
+rng(1)
 hcoefs = 0.1*rand(1,2*nh+1);
 uder = frechet_mats.bdry*hcoefs(:);
 
@@ -83,7 +84,7 @@ for ig=1:2
     errs(ig) = norm(uder-uder_est);
 end
 fprintf('Error in Frechet derivative of Dirichlet problem: %d \n',errs(2));
-
+errs
 
 % Test obstacle Frechet derivative for Neumann problem
 bc = [];
