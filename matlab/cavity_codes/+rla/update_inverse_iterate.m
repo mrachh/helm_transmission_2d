@@ -233,6 +233,8 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
     opts_update_geom.nppw = nppw;
     opts_update_geom.rlam = rlam;
     
+    res_in = norm(rhs(:))/norm(u_meas.uscat_tgt(:));
+    
     if(strcmpi(bc.invtype,'o') || strcmpi(bc.invtype,'oi') || strcmpi(bc.invtype,'io'))
         deltas.nmodes_bdry = opts_use.ncoeff_boundary;
         Minv = [real(frechet_mats.bdry); imag(frechet_mats.bdry)];
@@ -243,7 +245,12 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
             iter_filter_bdry_gn = -1;
             for iter=1:maxit_filter
                 [src_out_gn,ier_gn] = rla.update_geom(src_info,ncoeff_boundary,delta_bdry_gn,opts_update_geom);
-                if(ier_gn == 0) 
+                [mats_out_gn] = rla.get_fw_mats(kh,src_out_gn,bc,u_meas,opts);
+                fields_out_gn = rla.compute_fields(kh,src_out_gn,mats_out_gn,u_meas,bc,opts);
+                rhs_gn = u_meas.uscat_tgt(:) - fields_out_gn.uscat_tgt(:);
+                res_gn = norm(rhs_gn(:))/norm(u_meas.uscat_tgt(:));
+                
+                if(ier_gn == 0 && res_gn <= res_in) 
                     iter_filter_bdry_gn = iter-1;
                     break
                 else
@@ -273,9 +280,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
             if(ier_gn ~=0)
                 mats_out_gn = mats;
                 fields_out_gn = fields;
-            else
-                [mats_out_gn] = rla.get_fw_mats(kh,src_out_gn,bc,u_meas,opts);
-                fields_out_gn = rla.compute_fields(kh,src_out_gn,mats_out_gn,u_meas,bc,opts);
+                res_gn = res_in;
             end
         end
         if(strcmpi(optim_type,'sd')  || strcmpi(optim_type,'min(sd,gn)') || strcmpi(optim_type,'min(gn,sd)'))
@@ -288,7 +293,11 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
             ier_sd = 10;
             for iter=1:maxit_filter
                 [src_out_sd,ier_sd] = rla.update_geom(src_info,ncoeff_boundary,delta_bdry_sd,opts_update_geom);
-                if(ier_sd == 0) 
+                [mats_out_sd] = rla.get_fw_mats(kh,src_out_sd,bc,u_meas,opts);
+                fields_out_sd = rla.compute_fields(kh,src_out_sd,mats_out_sd,u_meas,bc,opts);
+                rhs_sd = u_meas.uscat_tgt(:) - fields_out_sd.uscat_tgt(:);
+                res_sd = norm(rhs_sd(:))/norm(u_meas.uscat_tgt(:));
+                if(ier_sd == 0 && res_sd<=res_in) 
                     iter_filter_bdry_sd = iter-1;
                     break
                 else
@@ -319,9 +328,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
             if(ier_sd ~=0)
                 mats_out_sd = mats;
                 fields_out_sd = fields;
-            else
-                [mats_out_sd] = rla.get_fw_mats(kh,src_out_sd,bc,u_meas,opts);
-                fields_out_sd = rla.compute_fields(kh,src_out_sd,mats_out_sd,u_meas,bc,opts);
+                res_sd = res_in;
             end
         end
         
@@ -331,9 +338,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
         elseif(strcmpi(optim_type,'sd'))
             deltas.iter_type = 'sd';
         elseif(strcmpi(optim_type,'min(sd,gn)') || strcmpi(optim_type,'min(gn,sd)'))
-            rhs_gn = u_meas.uscat_tgt(:) - fields_out_gn.uscat_tgt(:);
-            rhs_sd = u_meas.uscat_tgt(:) - fields_out_sd.uscat_tgt(:);
-            if(norm(rhs_gn(:)) < norm(rhs_sd(:)))
+            if(res_gn < res_sd)
                 deltas.iter_type = 'gn';
             else
                 deltas.iter_type = 'sd';
@@ -343,16 +348,14 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
         end
         
         if(strcmpi(deltas.iter_type,'gn'))
-            rhs_gn = u_meas.uscat_tgt(:) - fields_out_gn.uscat_tgt(:);
             deltas.delta_bdry = delta_bdry_gn;
             deltas.iter_filter_bdry = iter_filter_bdry_gn;
             mats_out = mats_out_gn;
             fields_out = fields_out_gn;
             ier = ier_gn;
             src_out = src_out_gn;
-            res = norm(rhs_gn(:))/norm(u_meas.uscat_tgt(:));
+            res = res_gn;
         elseif(strcmpi(deltas.iter_type,'sd'))
-            rhs_sd = u_meas.uscat_tgt(:) - fields_out_sd.uscat_tgt(:);
             deltas.delta_bdry = delta_bdry_sd;
             deltas.iter_filter_bdry = iter_filter_bdry_sd;
             
@@ -360,7 +363,7 @@ function [deltas,src_out,mats_out,fields_out,res,ier] = ...
             fields_out = fields_out_sd;
             ier = ier_sd;
             src_out = src_out_sd;
-            res = norm(rhs_sd(:))/norm(u_meas.uscat_tgt(:));
+            res = res_sd;
         end      
     end
     if(strcmpi(bc.invtype,'i') || strcmpi(bc.invtype,'oi') || strcmpi(bc.invtype,'io'))
