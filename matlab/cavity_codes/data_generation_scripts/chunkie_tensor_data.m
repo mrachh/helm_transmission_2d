@@ -20,7 +20,7 @@ plot(src_info.xs,src_info.ys);
 
 
 
-nk = 2;
+nk = 15;
 
 
 % Test obstacle Frechet derivative for Dirichlet problem
@@ -85,8 +85,7 @@ for ik=1:nk
    [fields] = helm_dirichlet_solver(kh(ik),src_info,sensor_info);
    u_meas0 = [];
    u_meas0.kh = kh(ik);
-   tmp = fields.uscat_tgt.';
-   u_meas0.uscat_tgt = tmp(:);
+   u_meas0.uscat_tgt = fields.uscat_tgt;
    u_meas0.tgt = sensor_info.tgt;
    u_meas0.t_dir = sensor_info.t_dir;
    %u_meas0.err_est = erra;

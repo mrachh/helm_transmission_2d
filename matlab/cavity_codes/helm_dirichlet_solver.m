@@ -111,7 +111,7 @@ toc;
     %u(:,i) = chunkerkerneval(chnkr,fkern,bd_sol(:,i),tgt_uni',opt_cnk);
     %toc
 %end
-fields.uscat_tgt = u;
+fields.uscat_tgt = u(induse);
 
    
 end
