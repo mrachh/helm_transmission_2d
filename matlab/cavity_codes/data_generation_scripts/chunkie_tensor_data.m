@@ -9,15 +9,18 @@ nc = 9;
 coefs = zeros(2*nc+1,1);
 coefs(1) = 1;
 coefs(nc+1) = 0.3;
+src_info = [];
 src_info.xs = [1,2,2,1,-1,-2,-2,-1,-1,-1.5,-1.5,1.5,1.5,1];
 src_info.ys = [-1,0,1,2,2,1,0,-1,0,0,1,1,0,0];
 src_info.xs = [0,1,0,-1];
 src_info.ys = [-1,0,1,0];
+figure(1)
+clf();
 plot(src_info.xs,src_info.ys);
 
 
 
-nk = 9;
+nk = 2;
 
 
 % Test obstacle Frechet derivative for Dirichlet problem
@@ -38,7 +41,7 @@ opts.verbose=true;
 % set target locations
 %receptors
 r_tgt = 10;
-n_tgt = 100;
+n_tgt = 88;
 t_tgt = 0:2*pi/n_tgt:2*pi-2*pi/n_tgt;
 
 % Incident directions
@@ -82,7 +85,8 @@ for ik=1:nk
    [fields] = helm_dirichlet_solver(kh(ik),src_info,sensor_info);
    u_meas0 = [];
    u_meas0.kh = kh(ik);
-   u_meas0.uscat_tgt = fields.uscat_tgt;
+   tmp = fields.uscat_tgt.';
+   u_meas0.uscat_tgt = tmp(:);
    u_meas0.tgt = sensor_info.tgt;
    u_meas0.t_dir = sensor_info.t_dir;
    %u_meas0.err_est = erra;

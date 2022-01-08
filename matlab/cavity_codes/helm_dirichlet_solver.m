@@ -78,8 +78,9 @@ F = chunkerflam(chnkr,fkern,dval,opts_flam);
    rval = reshape(rval,2,chnkr.k*chnkr.nch);
    xs = rval(1,:);
    ys = rval(2,:);
-   
+
 fields.uinc  = exp(1i *kh * (bsxfun(@times,xs',x_dir)+bsxfun(@times,ys',y_dir)));
+size(fields.uinc)
 tic
 bd_sol = rskelf_sv(F,-fields.uinc);
 toc
@@ -94,6 +95,11 @@ eval_srcinfo = []; eval_srcinfo.r = chnkr.r(:,:,:);
 eval_targinfo = []; eval_targinfo.r = tgt_uni';
 kernmat = fkern(eval_srcinfo,eval_targinfo);
 
+wts = weights(chnkr);
+wts = wts(:);
+wts = repmat(wts,[1,nangs]); 
+bd_sol = bd_sol.*wts;
+size(kernmat)
 tic;
 u = (kernmat*bd_sol);
 toc;
