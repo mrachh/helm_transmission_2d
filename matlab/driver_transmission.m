@@ -7,7 +7,7 @@ addpath('./src')
 k0    = 1.;
 dk    = 0.25;
 %n_kh  = 117;%->30
-n_kh  = 197;%->50
+n_kh  = 57;%->50
 khv   = k0:dk:k0+(n_kh-1)*dk;
 
 %domain jump
@@ -15,14 +15,14 @@ rho_d = 1.;
 
 %ratio type for contrast
 % q_plus_1 = 0.1, 0.33,  0.5, 0.9, 0.99, 1.01, 1.1, 2, 3, 10
-q_plus_1 = 1.01;%need dom2 with inc5 and q10
+q_plus_1 = 10;%need dom2 with inc5 and q10
 
 %setting domain
 % dom_type = 1 circle radius 1 with center (0.3,0.3)
 %            2 simple plane
 %            3 cavity 1
 %            4 cavity 2
-dom_type = 3;
+dom_type = 1;
 
 %setting incident waves and receptors
 % inc_type = 1 10 inc dir 200 recep
@@ -40,11 +40,11 @@ noise_type =0;
 noise_lvl = 0.02;
 
 %file to save data
-gen_data_file = strcat('../../test-data/data_k',int2str(ceil(khv(n_kh))),...
+gen_data_file = strcat('transmission-data/data_k',int2str(ceil(khv(n_kh))),...
     '_dom',int2str(dom_type),'_inctype',int2str(inc_type),'_q_func',...
      num2str(q_plus_1),'.mat');
  
-res_file = strcat('../../results/transmission/sol_k',int2str(ceil(khv(n_kh))),...
+res_file = strcat('transmission-results/sol_k',int2str(ceil(khv(n_kh))),...
     '_dom',int2str(dom_type),'_inctype',int2str(inc_type),'_q_func',...
      num2str(q_plus_1),'_noise',int2str(noise_type),'_noiselvl',num2str(noise_lvl),'.mat');
 
